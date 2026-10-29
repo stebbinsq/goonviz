@@ -35,8 +35,13 @@ frame rate: if frames run late it renders slightly fewer pixels, and steps back 
 presets stay smooth. The fps readout shows `actual/display` (e.g. `60/60`). A 60 Hz screen or projector can't show
 more than 60 fps; on a 120 Hz display GoonViz will run at 120 when the preset allows.
 
-The **3D set** (Fractal Cathedral, Mandelbulb Bloom, Chrome Lattice) is raymarched: full 3D scenes with lighting.
-They're the heaviest presets and are meant for the Mac; on a Pi they'll crawl.
+The **3D and 4D sets** are raymarched: full scenes with lighting. 3D: Mandelbox, Apollonian Foam, Fractal Cathedral,
+Mandelbulb Bloom, Chrome Lattice. 4D (four-dimensional shapes sliced into 3D as they turn through the 4th
+dimension): Quaternion Julia, Tesseract Lattice, Hyper Crystal, Hypergyroid. They're the heaviest presets and are
+meant for the Mac; on a Pi they'll crawl.
+
+Retired presets live in `presets/archive/` (not loaded). To bring one back, move it into `presets/`, give it a
+free number, and run `python3 tools/build_web.py`.
 
 ### Editing presets for the web version
 
