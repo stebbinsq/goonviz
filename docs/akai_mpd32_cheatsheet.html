@@ -1,0 +1,100 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Akai MPD32 cheat sheet</title>
+<style>
+@page { size: letter landscape; margin: 0.35in; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 10px/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif; color: #111; background: #fff;
+       -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 10.3in; height: 7.8in; page-break-after: always; display: flex; flex-direction: column; gap: 8px; }
+.page:last-child { page-break-after: auto; }
+header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #111; padding-bottom: 4px; }
+h1 { font-size: 20px; margin: 0; letter-spacing: 0.5px; }
+h1 span { font-weight: 400; color: #666; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; margin: 0 0 4px; }
+h2 em { font-style: normal; font-weight: 400; text-transform: none; letter-spacing: 0; color: #666; }
+.note { font-size: 9.5px; color: #444; }
+.main { display: grid; grid-template-columns: 3.55in 1fr; gap: 14px; flex: 1; }
+.padbanks { display: flex; flex-direction: column; gap: 10px; }
+.pads { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.pad { position: relative; height: 0.62in; border: 1.5px solid #111; border-radius: 5px; padding: 12px 4px 3px;
+       display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.pad b { font-size: 10px; }
+.pad b.num { font-size: 15px; }
+.pad small { font-size: 7.5px; color: #333; line-height: 1.1; }
+.tag { position: absolute; top: 2px; left: 4px; font-size: 7px; color: #888; font-weight: 700; }
+.pad.preset { background: #f1f1f1; }
+.pad.snap { background: #e6eefc; border-color: #2350a0; }
+.pad.action { background: #fff; }
+.pad.empty { border-style: dashed; border-color: #bbb; }
+.banks { display: flex; flex-direction: column; gap: 10px; }
+.rowlabel { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #777; margin: 3px 0 1px; }
+.row8 { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.ctl { position: relative; border: 1.5px solid #111; padding: 11px 3px 3px; min-height: 0.48in; text-align: center;
+       display: flex; flex-direction: column; justify-content: center; }
+.ctl b { font-size: 9.5px; }
+.ctl small { font-size: 7px; color: #444; line-height: 1.1; }
+.ctl.knob { border-radius: 999px; }
+.ctl.knob .tag { left: 50%; transform: translateX(-50%); top: 2px; }
+.ctl.fader { border-radius: 3px; min-height: 0.62in; }
+.ctl.switch { border-radius: 3px; }
+.ctl.empty { border-style: dashed; border-color: #bbb; color: #bbb; }
+.ctl.hot, .pad.hot { background: #111; color: #fff; }
+.ctl.hot small, .pad.hot small { color: #ddd; }
+.ctl.hot .tag, .pad.hot .tag { color: #bbb; }
+.ctl.action, .pad.action { background: #fff7df; }
+.transport { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.transport .ctl { min-height: 0.36in; border-radius: 3px; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 8.5px; color: #333; }
+.sw { display: inline-block; width: 10px; height: 10px; border: 1.5px solid #111; vertical-align: -2px; margin-right: 3px; }
+table { border-collapse: collapse; width: 100%; font-size: 9px; }
+th, td { border-bottom: 1px solid #ccc; padding: 3px 5px; text-align: left; vertical-align: top; }
+th { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1.5px solid #111; }
+td.n { font-weight: 700; width: 22px; }
+.cols2 { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; flex: 1; }
+.box { border: 1.5px solid #111; border-radius: 5px; padding: 7px 9px; }
+.box ol, .box ul { margin: 0; padding-left: 16px; }
+.box li { margin-bottom: 2px; }
+kbd { font: 700 8.5px Menlo, monospace; border: 1px solid #999; border-radius: 3px; padding: 0 3px; }
+</style></head><body>
+<section class="page">
+  <header><h1>GOONVIZ <span>× Akai MPD32</span></h1><div class="note">Load preset 18 &#x27;ArkaosVJ&#x27; on the MPD32 (PRESET button, then the dial). Its knobs/faders/switches send CC 1-72 and its pads latch.</div></header>
+  <div class="main">
+    <div class="padbanks"><div><h2>Pad bank A <em>press PAD BANK A</em></h2><div class="pads"><div class="pad preset"><span class="tag">A13</span><b class="num">13</b><small>Yantra</small></div><div class="pad preset"><span class="tag">A14</span><b class="num">14</b><small>Third Eye</small></div><div class="pad preset"><span class="tag">A15</span><b class="num">15</b><small>Spirit Mirror (video)</small></div><div class="pad preset"><span class="tag">A16</span><b class="num">16</b><small>Video Melt (video)</small></div><div class="pad preset"><span class="tag">A9</span><b class="num">9</b><small>Bioluminescence</small></div><div class="pad preset"><span class="tag">A10</span><b class="num">10</b><small>Julia Bloom</small></div><div class="pad preset"><span class="tag">A11</span><b class="num">11</b><small>Spiral Vortex</small></div><div class="pad preset"><span class="tag">A12</span><b class="num">12</b><small>Sound Halo</small></div><div class="pad preset"><span class="tag">A5</span><b class="num">5</b><small>Crystal Caverns</small></div><div class="pad preset"><span class="tag">A6</span><b class="num">6</b><small>Star Gate</small></div><div class="pad preset"><span class="tag">A7</span><b class="num">7</b><small>Apollonian Lace</small></div><div class="pad preset"><span class="tag">A8</span><b class="num">8</b><small>Wormhole</small></div><div class="pad preset"><span class="tag">A1</span><b class="num">1</b><small>Astral Mandala</small></div><div class="pad preset"><span class="tag">A2</span><b class="num">2</b><small>Fractal Temple</small></div><div class="pad preset"><span class="tag">A3</span><b class="num">3</b><small>Liquid Spirit</small></div><div class="pad preset"><span class="tag">A4</span><b class="num">4</b><small>Flower of Life</small></div></div></div><div><h2>Pad bank B <em>press PAD BANK B</em></h2><div class="pads"><div class="pad snap"><span class="tag">B13</span><b>Snap 5</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B14</span><b>Snap 6</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B15</span><b>Snap 7</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B16</span><b>Snap 8</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B9</span><b>Snap 1</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B10</span><b>Snap 2</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B11</span><b>Snap 3</b><small>SHIFT + hit = save</small></div><div class="pad snap"><span class="tag">B12</span><b>Snap 4</b><small>SHIFT + hit = save</small></div><div class="pad action"><span class="tag">B5</span><b>◀ Prev</b><small></small></div><div class="pad action"><span class="tag">B6</span><b>Next ▶</b><small></small></div><div class="pad action"><span class="tag">B7</span><b>Tap beat</b><small></small></div><div class="pad action"><span class="tag">B8</span><b>Flash</b><small></small></div><div class="pad preset"><span class="tag">B1</span><b class="num">17</b><small>Video Fractal (video)</small></div><div class="pad action"><span class="tag">B2</span><b>Random preset</b><small></small></div><div class="pad action"><span class="tag">B3</span><b>Randomize FX</b><small></small></div><div class="pad action"><span class="tag">B4</span><b>Reset knobs</b><small></small></div></div></div>
+      <div><h2>Transport</h2><div class="transport"><div class="ctl action "><span class="tag">◀◀</span><b>◀ Prev</b><small></small></div><div class="ctl action "><span class="tag">▶▶</span><b>Next ▶</b><small></small></div><div class="ctl hot "><span class="tag">■ STOP</span><b>BLACKOUT</b><small></small></div><div class="ctl action "><span class="tag">▶ PLAY</span><b>Autopilot</b><small></small></div><div class="ctl action "><span class="tag">● REC</span><b>Randomize FX</b><small></small></div></div></div>
+    </div>
+    <div class="banks"><div><h2>Control bank A <em>default bank</em></h2><div class="rowlabel">knobs</div><div class="row8"><div class="ctl param knob"><span class="tag">K1</span><b>Knob A</b><small>preset&#x27;s own control</small></div><div class="ctl param knob"><span class="tag">K2</span><b>Knob B</b><small>preset&#x27;s own control</small></div><div class="ctl param knob"><span class="tag">K3</span><b>Knob C</b><small>preset&#x27;s own control</small></div><div class="ctl param knob"><span class="tag">K4</span><b>Knob D</b><small>preset&#x27;s own control</small></div><div class="ctl param knob"><span class="tag">K5</span><b>Speed</b><small>time rate</small></div><div class="ctl param knob"><span class="tag">K6</span><b>Zoom</b><small>scale the scene</small></div><div class="ctl param knob"><span class="tag">K7</span><b>Palette</b><small>8 colour sets</small></div><div class="ctl param knob"><span class="tag">K8</span><b>Hue</b><small>master colour shift</small></div></div><div class="rowlabel">faders</div><div class="row8"><div class="ctl param fader"><span class="tag">F1</span><b>Trails</b><small>feedback amount</small></div><div class="ctl param fader"><span class="tag">F2</span><b>Trail zoom</b><small>tunnel in / out</small></div><div class="ctl param fader"><span class="tag">F3</span><b>Trail spin</b><small>swirl left / right</small></div><div class="ctl param fader"><span class="tag">F4</span><b>Trail hue</b><small>rainbow drift</small></div><div class="ctl param fader"><span class="tag">F5</span><b>Glow</b><small>bloom haze</small></div><div class="ctl param fader"><span class="tag">F6</span><b>Kaleido</b><small>off → 12 mirrors</small></div><div class="ctl param fader"><span class="tag">F7</span><b>Camera mix</b><small>blend live video</small></div><div class="ctl hot fader"><span class="tag">F8</span><b>MASTER</b><small>brightness</small></div></div><div class="rowlabel">switches</div><div class="row8"><div class="ctl action switch"><span class="tag">S1</span><b>Autopilot</b><small></small></div><div class="ctl action switch"><span class="tag">S2</span><b>Freeze</b><small></small></div><div class="ctl action switch"><span class="tag">S3</span><b>Camera on/off</b><small></small></div><div class="ctl param switch"><span class="tag">S4</span><b>Strobe</b><small>flash on beats</small></div><div class="ctl param switch"><span class="tag">S5</span><b>Invert</b><small>negative image</small></div><div class="ctl action switch"><span class="tag">S6</span><b>Overlay</b><small></small></div><div class="ctl hot switch"><span class="tag">S7</span><b>BLACKOUT</b><small></small></div><div class="ctl hot switch"><span class="tag">S8</span><b>SHIFT</b><small></small></div></div></div><div><h2>Control bank B <em>press CONTROL BANK until B is lit</em></h2><div class="rowlabel">knobs</div><div class="row8"><div class="ctl param knob"><span class="tag">K1</span><b>Warp</b><small>liquid distortion</small></div><div class="ctl param knob"><span class="tag">K2</span><b>Chroma</b><small>RGB split</small></div><div class="ctl param knob"><span class="tag">K3</span><b>Saturation</b><small>grey → vivid</small></div><div class="ctl param knob"><span class="tag">K4</span><b>Contrast</b><small></small></div><div class="ctl param knob"><span class="tag">K5</span><b>Audio react</b><small>how hard sound hits</small></div><div class="ctl param knob"><span class="tag">K6</span><b>Strobe</b><small>flash on beats</small></div><div class="ctl param knob"><span class="tag">K7</span><b>Zoom</b><small>scale the scene</small></div><div class="ctl param knob"><span class="tag">K8</span><b>Speed</b><small>time rate</small></div></div><div class="rowlabel">faders</div><div class="row8"><div class="ctl param fader"><span class="tag">F1</span><b>Knob A</b><small>preset&#x27;s own control</small></div><div class="ctl param fader"><span class="tag">F2</span><b>Knob B</b><small>preset&#x27;s own control</small></div><div class="ctl param fader"><span class="tag">F3</span><b>Knob C</b><small>preset&#x27;s own control</small></div><div class="ctl param fader"><span class="tag">F4</span><b>Knob D</b><small>preset&#x27;s own control</small></div><div class="ctl param fader"><span class="tag">F5</span><b>360 view</b><small>flat · look · planet · hole</small></div><div class="ctl param fader"><span class="tag">F6</span><b>360 spin</b><small>pan the room ◀ ▶</small></div><div class="ctl param fader"><span class="tag">F7</span><b>Saturation</b><small>grey → vivid</small></div><div class="ctl param fader"><span class="tag">F8</span><b>Audio react</b><small>how hard sound hits</small></div></div><div class="rowlabel">switches</div><div class="row8"><div class="ctl empty switch"><span class="tag">S1</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S2</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S3</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S4</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S5</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S6</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S7</span><b>—</b></div><div class="ctl empty switch"><span class="tag">S8</span><b>—</b></div></div></div>
+      <div class="legend">
+        <span><span class="sw" style="background:#111"></span>show-critical</span>
+        <span><span class="sw" style="background:#fff7df"></span>action</span>
+        <span><span class="sw" style="background:#e6eefc;border-color:#2350a0"></span>snapshot (hold SHIFT to save)</span>
+        <span><span class="sw" style="background:#f1f1f1"></span>preset</span>
+        <span>Switches: on = engaged · works in momentary (hold) or toggle mode</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page">
+  <header><h1>GOONVIZ <span>presets &amp; knobs A–D</span></h1><div class="note">Knobs K1–K4 (and bank B faders F1–F4) change meaning per preset.</div></header>
+  <div class="cols2">
+    <table><tr><th>#</th><th>Preset</th><th>A (K1)</th><th>B (K2)</th><th>C (K3)</th><th>D (K4)</th></tr><tr><td class="n">1</td><td><b>Astral Mandala</b></td><td>petals</td><td>layers</td><td>filigree</td><td>color drift</td></tr><tr><td class="n">2</td><td><b>Fractal Temple</b></td><td>symmetry</td><td>spread</td><td>fold angle</td><td>color</td></tr><tr><td class="n">3</td><td><b>Liquid Spirit</b></td><td>turbulence</td><td>filaments</td><td>filament count</td><td>color</td></tr><tr><td class="n">4</td><td><b>Flower of Life</b></td><td>scale</td><td>second layer</td><td>line width</td><td>color</td></tr><tr><td class="n">5</td><td><b>Crystal Caverns</b></td><td>cave scale</td><td>wall thickness</td><td>quality (Pi: keep low)</td><td>color</td></tr><tr><td class="n">6</td><td><b>Star Gate</b></td><td>star density</td><td>gate rings</td><td>ring spacing</td><td>color</td></tr><tr><td class="n">7</td><td><b>Apollonian Lace</b></td><td>inversion</td><td>drift</td><td>lace brightness</td><td>color</td></tr><tr><td class="n">8</td><td><b>Wormhole</b></td><td>twist</td><td>segments</td><td>ornament</td><td>color</td></tr><tr><td class="n">9</td><td><b>Bioluminescence</b></td><td>cell size</td><td>wobble</td><td>nuclei</td><td>color</td></tr><tr><td class="n">10</td><td><b>Julia Bloom</b></td><td>seed angle</td><td>morph speed</td><td>detail</td><td>color</td></tr><tr><td class="n">11</td><td><b>Spiral Vortex</b></td><td>arms</td><td>tightness</td><td>lattice</td><td>color</td></tr><tr><td class="n">12</td><td><b>Sound Halo</b></td><td>filaments</td><td>radius</td><td>spikes</td><td>color</td></tr><tr><td class="n">13</td><td><b>Yantra</b></td><td>triangles</td><td>lotus petals</td><td>line glow</td><td>color</td></tr><tr><td class="n">14</td><td><b>Third Eye</b></td><td>iris fibres</td><td>lid rays</td><td>eye size</td><td>color</td></tr><tr><td class="n">15</td><td><b>Spirit Mirror (video)</b></td><td>edge gain</td><td>aura</td><td>body fill</td><td>color</td></tr><tr><td class="n">16</td><td><b>Video Melt (video)</b></td><td>melt</td><td>flow speed</td><td>contours</td><td>color</td></tr><tr><td class="n">17</td><td><b>Video Fractal (video)</b></td><td>folds</td><td>spread</td><td>tint</td><td>color</td></tr></table>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="box"><h2>Show checklist</h2><ol>
+        <li>Power the MPD32 and load preset <b>18 ArkaosVJ</b> before starting GoonViz.</li>
+        <li>Pads latch in that preset: every hit counts, so ignore the pad lights.</li>
+        <li>Bring MASTER (F8) up. Keep a finger near <b>BLACKOUT</b> (S7) or ■ STOP.</li>
+        <li><b>Autopilot</b> (S1 / ▶ PLAY) changes preset every 32 beats if you need your hands free.</li>
+        <li>Save looks: S8 SHIFT on, hit a blue snapshot pad, SHIFT off.</li>
+      </ol></div>
+      <div class="box"><h2>If something's off</h2><ul>
+        <li>Pads do nothing: on the Pi run <kbd>run.py --learn-pads</kbd> and hit the pads in order.</li>
+        <li>Change any control: plug in a keyboard, <kbd>H</kbd>, ↑↓ to choose, <kbd>L</kbd>, move the control.</li>
+        <li>Then reprint: <kbd>python tools/make_cheatsheet.py</kbd></li>
+        <li>No reaction to music: check the audio input; Audio react is bank B K5.</li>
+      </ul></div>
+      <div class="box"><h2>Keyboard</h2>
+        <kbd>←</kbd><kbd>→</kbd> preset · <kbd>R</kbd> randomize · <kbd>B</kbd> blackout · <kbd>A</kbd> autopilot ·
+        <kbd>Space</kbd> flash · <kbd>H</kbd> overlay · <kbd>F1</kbd>–<kbd>F8</kbd> snapshots · <kbd>Esc</kbd> quit
+      </div>
+    </div>
+  </div>
+</section>
+</body></html>

@@ -1,0 +1,8 @@
+pygame-ce>=2.4
+moderngl>=5.10
+numpy>=1.24
+mido>=1.3
+python-rtmidi>=1.5
+sounddevice>=0.4.6
+# opencv-python       # for video input; on the Pi install python3-opencv via apt instead (setup_pi.sh does)
+# pillow              # only for tools/render_presets.py

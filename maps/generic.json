@@ -1,0 +1,43 @@
+{
+  "cc": {
+    "1": "a",
+    "2": "b",
+    "3": "c",
+    "4": "d",
+    "5": "speed",
+    "6": "feedback",
+    "7": "brightness",
+    "8": "glow",
+    "9": "fb_zoom",
+    "10": "fb_rotate",
+    "11": "fb_hue",
+    "12": "kaleido",
+    "13": "warp",
+    "14": "chroma",
+    "15": "hue",
+    "16": "palette",
+    "17": "zoom",
+    "18": "video_mix",
+    "19": "react",
+    "20": "strobe"
+  },
+  "note": {
+    "36": "preset:0",  "37": "preset:1",  "38": "preset:2",  "39": "preset:3",
+    "40": "preset:4",  "41": "preset:5",  "42": "preset:6",  "43": "preset:7",
+    "44": "preset:8",  "45": "preset:9",  "46": "preset:10", "47": "preset:11",
+    "48": "preset:12", "49": "preset:13", "50": "preset:14", "51": "preset:15",
+    "60": "prev",
+    "62": "next",
+    "64": "randomize",
+    "65": "random_preset",
+    "67": "autopilot",
+    "69": "flash",
+    "71": "blackout",
+    "72": "shift",
+    "73": "snapshot:0",
+    "74": "snapshot:1",
+    "75": "snapshot:2",
+    "76": "snapshot:3"
+  },
+  "program_change_selects_preset": true
+}

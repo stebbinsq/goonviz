@@ -1,0 +1,40 @@
+{
+  "fullscreen": true,
+  "window_size": [
+    1280,
+    720
+  ],
+  "render_scale": 0.5,
+  "max_fps": 60,
+  "start_preset": 0,
+  "audio": {
+    "device": "Insta360",
+    "samplerate": 48000,
+    "gain": 1.0,
+    "fake": false,
+    "noise_floor": 0.004,
+    "fallback_to_default": true
+  },
+  "video": {
+    "source": "insta360",
+    "width": 640,
+    "height": 360,
+    "capture_size": [
+      1920,
+      960
+    ]
+  },
+  "midi": {
+    "port": null,
+    "map": "maps/akai_mpd32.json",
+    "clock_beats": true,
+    "pickup": false
+  },
+  "autopilot": {
+    "enabled": false,
+    "beats": 32,
+    "seconds": 30,
+    "randomize": true
+  },
+  "snapshots": "snapshots.json"
+}

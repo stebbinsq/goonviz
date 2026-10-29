@@ -1,0 +1,41 @@
+{
+  "cc": {
+    "0": "a",
+    "1": "b",
+    "2": "c",
+    "3": "d",
+    "4": "feedback",
+    "5": "glow",
+    "6": "video_mix",
+    "7": "brightness",
+    "16": "speed",
+    "17": "zoom",
+    "18": "fb_zoom",
+    "19": "fb_rotate",
+    "20": "fb_hue",
+    "21": "kaleido",
+    "22": "warp",
+    "23": "palette",
+
+    "32": "snapshot:0", "33": "snapshot:1", "34": "snapshot:2", "35": "snapshot:3",
+    "36": "snapshot:4", "37": "snapshot:5", "38": "snapshot:6", "39": "snapshot:7",
+    "48": "preset:0", "49": "preset:1", "50": "preset:2", "51": "preset:3",
+    "52": "preset:4", "53": "preset:5", "54": "preset:6", "55": "preset:7",
+    "64": "preset:8", "65": "preset:9", "66": "preset:10", "67": "preset:11",
+    "68": "preset:12", "69": "preset:13", "70": "preset:14", "71": "preset:15",
+
+    "58": "prev",
+    "59": "next",
+    "46": "autopilot",
+    "60": "shift",
+    "61": "randomize",
+    "62": "random_preset",
+    "43": "reset",
+    "44": "tap",
+    "42": "blackout",
+    "41": "freeze",
+    "45": "flash"
+  },
+  "note": {},
+  "program_change_selects_preset": true
+}
