@@ -57,6 +57,7 @@
       this.fps = 60;
 
       this.buildPanel();
+      if (!window.isSecureContext) this.insecureWarning();
       this.selectPreset(0);
       this.bindKeys();
       new ResizeObserver(() => this.resize()).observe(this.canvas);
@@ -215,6 +216,7 @@
     // ---- devices ----------------------------------------------------------
 
     async start() {
+      if (!window.isSecureContext) return this.insecureWarning();
       $("#start").disabled = true;
       $("#start").textContent = "Starting…";
       await this.midi.start();
@@ -228,6 +230,15 @@
       $("#start").hidden = true;
       $("body").classList.add("started");
       this.refreshChrome();
+    }
+
+    // Chrome only offers camera, mic and MIDI on https (or localhost / a file on disk), and on plain http
+    // it doesn't even ask. Say so instead of failing silently.
+    insecureWarning() {
+      const secure = location.href.replace(/^http:/, "https:");
+      $("#introText").innerHTML = `This page was opened over plain <b>http</b>, so Chrome won't allow the camera,
+        microphone or MIDI (it doesn't even ask). Open the secure version: <a href="${secure}">${secure}</a>`;
+      this.notify("needs https for camera, mic and MIDI");
     }
 
     async startCamera(deviceId) {
