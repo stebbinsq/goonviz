@@ -44,7 +44,7 @@
       this.pilot = new Prism.Autopilot(this.params, D.kaleidoChaos, D.palettes.length);
       this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
 
-      this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0 };
+      this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0, transition: 0 };
       this.shift = this.frozen = this.flashHeld = false;
       this.blackoutTarget = 0;
       this.videoActive = true;
@@ -55,6 +55,11 @@
       this.clockTicks = 0;
       this.lastBeatCount = 0;
       this.fps = 60;
+      this.dyn = 1;              // adaptive resolution multiplier (1 = the quality setting's full size)
+      this.frameMs = 16.7;       // smoothed frame time
+      this.refreshMs = 16.7;     // the display's refresh interval (see adaptResolution)
+      this.recentMs = [];
+      this.dynCheck = 0;
 
       this.buildPanel();
       if (!window.isSecureContext) this.insecureWarning();
@@ -103,13 +108,15 @@
 
     selectPreset(index) {
       const n = this.presets.length;
+      const before = this.presetIndex;
       for (let step = 0; step < n; step++) {
         const i = (((index + step) % n) + n) % n;
         if (this.presets[i].program) { this.presetIndex = i; break; }
       }
+      if (before !== undefined && before !== this.presetIndex) this.st.transition = 1; // melt old into new
       this.params.loadPreset(this.preset.params);
       this.picked.clear();
-      this.pilot?.startPreset();
+      this.pilot?.startPreset(this.preset.stepped);
       this.notify(this.preset.name);
       this.refreshPresetButtons();
       this.refreshLabels();
@@ -130,7 +137,7 @@
       else if (action === "reset") { this.params.loadPreset(this.preset.params); this.picked.clear(); }
       else if (action === "autopilot") {
         this.pilot.enabled = !this.pilot.enabled;
-        if (this.pilot.enabled) { this.pilot.homeHue = null; this.pilot.startPreset(); }
+        if (this.pilot.enabled) { this.pilot.homeHue = null; this.pilot.startPreset(this.preset.stepped); }
         this.notify(`autopilot ${this.pilot.enabled ? "on" : "off"}`);
       }
       else if (action === "blackout") this.blackoutTarget = 1 - this.blackoutTarget;
@@ -310,7 +317,33 @@
       const q = this.settings.quality;
       const targetWidth = q === "low" ? 800 : q === "medium" ? 1200 : q === "high" ? 1920
                         : this.engine.weakGpu ? 960 : 1440; // auto: Intel graphics get a lighter load
-      this.engine.resize(w, h, Math.min(1, targetWidth / w));
+      this.engine.resize(w, h, Math.min(1, targetWidth / w) * this.dyn);
+    }
+
+    // Adaptive resolution: if frames run late for a second, render ~12% fewer pixels; when there's
+    // headroom for a few seconds, step back up. Keeps motion smooth on heavy 3D presets.
+    adaptResolution(dt, now) {
+      const ms = dt * 1000;
+      this.frameMs += (ms - this.frameMs) * 0.08;
+      this.recentMs.push(ms);
+      if (this.recentMs.length > 120) this.recentMs.shift();
+      if (now < this.dynCheck) return;
+      // refresh interval = the typical fast frame (20th percentile), snapped to a real display rate,
+      // so a few early/odd frames can't fool it
+      const sorted = [...this.recentMs].sort((a, b) => a - b);
+      const p20 = sorted[Math.floor(sorted.length * 0.2)] || 16.7;
+      this.refreshMs = [144, 120, 100, 90, 75, 60, 50, 30].map((hz) => 1000 / hz)
+        .reduce((best, x) => (Math.abs(x - p20) < Math.abs(best - p20) ? x : best));
+      const target = this.refreshMs;
+      if (this.frameMs > target * 1.18 && this.dyn > 0.5) {
+        this.dyn = Math.max(0.5, this.dyn * 0.88);
+        this.dynCheck = now + 1000;
+        this.resize();
+      } else if (this.frameMs < target * 1.04 && this.dyn < 1) {
+        this.dyn = Math.min(1, this.dyn * 1.06);
+        this.dynCheck = now + 3000;
+        this.resize();
+      } else this.dynCheck = now + 500;
     }
 
     // ---- frame ----------------------------------------------------------------
@@ -319,6 +352,7 @@
       const dt = Math.min((now - this.last) / 1000, 0.1);
       this.last = now;
       if (dt > 0) this.fps += (1 / dt - this.fps) * 0.05;
+      if (dt > 0 && this.settings.quality === "auto") this.adaptResolution(dt, now);
       const P = this.params, st = this.st;
 
       this.audio.update(dt);
@@ -335,6 +369,7 @@
       st.camYaw = (st.camYaw + dt * P.v("cam_spin") * 0.6) % (Math.PI * 2);
       st.flash = this.flashHeld ? 1 : st.flash * Math.exp(-dt * 10);
       st.blackout += (this.blackoutTarget - st.blackout) * (1 - Math.exp(-dt * 4));
+      st.transition = Math.max(0, st.transition - dt / 1.2); // 1.2 s melt between presets
 
       this.engine.render(this.preset, P, st, this.audio);
       if ((this._uiTick = (this._uiTick || 0) + 1) % 6 === 0) this.refreshLive();
@@ -548,7 +583,7 @@
       const bar = (x) => `<i style="width:${Math.round(Math.min(1, x) * 100)}%"></i>`;
       $("#meters").innerHTML = `<span>bass</span><b>${bar(a.bass)}</b><span>mid</span><b>${bar(a.mid)}</b><span>high</span><b>${bar(a.high)}</b>` +
         `<span class="beat ${a.beat > 0.5 ? "hit" : ""}">●</span>`;
-      $("#fps").textContent = `${Math.round(this.fps)} fps · ${this.engine.internal[0]}×${this.engine.internal[1]}`;
+      $("#fps").textContent = `${Math.round(this.fps)}/${Math.round(1000 / this.refreshMs)} fps · ${this.engine.internal[0]}×${this.engine.internal[1]}`;
       $("#midiStatus").textContent = this.midi.status;
       $("#midiLast").textContent = this.midi.last;
       $("#audioStatus").textContent = a.fake ? "demo beat" : a.status === "live" ? a.label : a.status;

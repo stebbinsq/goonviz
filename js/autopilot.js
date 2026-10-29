@@ -17,6 +17,7 @@
       this.base = {};
       this.dest = {};
       this.touched = new Set();
+      this.stepped = new Set();
       this.homeHue = null; // your hue: autopilot wobbles around it (reset when autopilot is switched on)
       this.resetCounters();
     }
@@ -30,7 +31,9 @@
       this.timeSinceSwitch = this.timeSinceDrift = 0;
     }
 
-    startPreset() {
+    // stepped: knobs this preset rounds to whole numbers; they stay put (gliding them makes shapes pop)
+    startPreset(stepped = this.stepped) {
+      this.stepped = new Set(stepped);
       if (this.homeHue === null || this.touched.has("hue")) this.homeHue = this.p.get("hue").target;
       this.base = Object.fromEntries(DRIFT.map((n) => [n, this.p.get(n).target]));
       this.base.hue = this.homeHue;
@@ -47,7 +50,7 @@
     retarget() {
       const amount = 0.15 + 0.85 * this.intensity;
       for (const n of DRIFT) {
-        if (this.touched.has(n)) continue;
+        if (this.touched.has(n) || this.stepped.has(n)) continue;
         const prm = this.p.get(n);
         const [lo, hi] = prm.chaos || [prm.lo, prm.hi];
         const wild = prm.toNorm(uniform(lo, hi));

@@ -28,6 +28,17 @@ void main() {
 
   const META_RE = /\/\/\s*@preset\s*(\{.*\})/;
 
+  // Same as stepped_knobs in prism/engine.py: knobs a preset rounds to whole numbers (counts), which
+  // autopilot must not glide (the shape would pop). Any line with floor( or int( counts.
+  function steppedKnobs(source) {
+    const found = new Set();
+    for (const line of source.split("\n")) {
+      const code = line.split("//")[0];
+      if (code.includes("floor(") || code.includes("int(")) for (const m of code.matchAll(/\bu([ABCD])\b/g)) found.add(m[1].toLowerCase());
+    }
+    return found;
+  }
+
   function parsePreset(key, source) {
     let meta = {};
     const m = source.match(META_RE);
@@ -39,6 +50,7 @@ void main() {
       name: meta.name || key.replace(/^\d+_/, "").replace(/_/g, " "),
       params: meta.params || {},
       labels: meta.labels || {},
+      stepped: steppedKnobs(source),
       program: null, error: null,
     };
   }
@@ -171,8 +183,8 @@ void main() {
       const iw = Math.max(16, Math.round(w * scale));
       const ih = Math.max(16, Math.round(h * scale));
       if (this.internal && this.internal[0] === iw && this.internal[1] === ih) return;
+      const old = this.internal && { fbo: this.compFbo[this.cur], w: this.internal[0], h: this.internal[1], owned: this._owned };
       this.internal = [iw, ih];
-      for (const t of this._owned || []) (t instanceof WebGLTexture ? gl.deleteTexture(t) : gl.deleteFramebuffer(t));
       this.sceneTex = this.texture(gl.RGBA8, iw, ih, gl.LINEAR, true);
       this.sceneFbo = this.target(this.sceneTex);
       // comp textures get a mip chain (sampled without mips) so the meter can read their 1x1 average
@@ -191,6 +203,15 @@ void main() {
         return fbo;
       });
       this._owned = [this.sceneTex, this.sceneFbo, ...this.compTex, ...this.compFbo, ...this.meterFbo];
+      if (old) {
+        // carry the current frame over (scaled) so a resolution change doesn't flash the trails to black
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, old.fbo);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.compFbo[this.cur]);
+        gl.blitFramebuffer(0, 0, old.w, old.h, 0, 0, iw, ih, gl.COLOR_BUFFER_BIT, gl.LINEAR);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        if (this.meterFence) { gl.deleteSync(this.meterFence); this.meterFence = null; }
+        for (const t of old.owned) (t instanceof WebGLTexture ? gl.deleteTexture(t) : gl.deleteFramebuffer(t));
+      }
     }
 
     // ---- per-frame inputs ---------------------------------------------
@@ -223,21 +244,41 @@ void main() {
 
     // ---- render --------------------------------------------------------
 
-    // Same as Engine._meter in prism/engine.py: measure the composited frame's average brightness;
-    // above a mean luma of 0.32 step the exposure down, below it creep back up to 1 (never brighter).
+    // Auto-exposure, same rule as Engine._meter in prism/engine.py: above a mean luma of 0.32 step the
+    // exposure down, below it creep back up to 1 (never brighter). The 1-pixel average is read back
+    // asynchronously (pixel buffer + fence) so the CPU never waits on the GPU: no stutter.
     meter(i) {
-      if (!this.autoExposure) { this.exposure = 1; return; }
-      if (++this.frameNo % 6) return;
       const gl = this.gl;
+      if (!this.autoExposure) { this.exposure = 1; return; }
+      if (this.meterFence) {
+        const st = gl.clientWaitSync(this.meterFence, 0, 0);
+        if (st === gl.ALREADY_SIGNALED || st === gl.CONDITION_SATISFIED) {
+          gl.bindBuffer(gl.PIXEL_PACK_BUFFER, this.meterPbo);
+          gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, this.meterPx);
+          gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+          gl.deleteSync(this.meterFence);
+          this.meterFence = null;
+          const [r, g, b] = this.meterPx;
+          const mean = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          this.exposure *= mean > 0.32 ? Math.pow(0.32 / mean, 0.35) : 1.04;
+          this.exposure = Math.min(1, Math.max(0.35, this.exposure));
+        }
+        return;
+      }
+      if (++this.frameNo % 6) return;
+      if (!this.meterPbo) {
+        this.meterPbo = gl.createBuffer();
+        gl.bindBuffer(gl.PIXEL_PACK_BUFFER, this.meterPbo);
+        gl.bufferData(gl.PIXEL_PACK_BUFFER, 4, gl.STREAM_READ);
+      }
       gl.bindTexture(gl.TEXTURE_2D, this.compTex[i]);
       gl.generateMipmap(gl.TEXTURE_2D);
       gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.meterFbo[i]);
-      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, this.meterPx);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, this.meterPbo);
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
       gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
-      const [r, g, b] = this.meterPx;
-      const mean = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      this.exposure *= mean > 0.32 ? Math.pow(0.32 / mean, 0.35) : 1.04;
-      this.exposure = Math.min(1, Math.max(0.35, this.exposure));
+      this.meterFence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     }
 
     set(p, name, ...v) {
@@ -322,6 +363,7 @@ void main() {
       s(c, "uChroma", P.v("chroma"));
       s(c, "uGlow", P.v("glow"));
       s(c, "uExposure", this.exposure);
+      s(c, "uTransition", st.transition || 0);
       s(c, "uVideoMix", P.v("video_mix"));
       s(c, "uVideoOn", videoOn);
       s(c, "uVideo360", v360);
