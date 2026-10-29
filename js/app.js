@@ -56,6 +56,7 @@
       this.lastBeatCount = 0;
       this.fps = 60;
       this.dyn = 1;              // adaptive resolution multiplier (1 = the quality setting's full size)
+      this.dynByPreset = {};     // what each preset settled on, so switching back starts at the right size
       this.frameMs = 16.7;       // smoothed frame time
       this.refreshMs = 16.7;     // the display's refresh interval (see adaptResolution)
       this.recentMs = [];
@@ -113,7 +114,12 @@
         const i = (((index + step) % n) + n) % n;
         if (this.presets[i].program) { this.presetIndex = i; break; }
       }
-      if (before !== undefined && before !== this.presetIndex) this.st.transition = 1; // melt old into new
+      if (before !== undefined && before !== this.presetIndex) {
+        this.st.transition = 1; // melt old into new
+        this.dynByPreset[this.presets[before].key] = this.dyn;
+        const remembered = this.dynByPreset[this.preset.key];
+        if (remembered !== undefined && remembered !== this.dyn) { this.dyn = remembered; this.resize(); }
+      }
       this.params.loadPreset(this.preset.params);
       this.picked.clear();
       this.pilot?.startPreset(this.preset.stepped);
