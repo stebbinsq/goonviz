@@ -18,7 +18,7 @@
     kaleido: "Kaleido", warp: "Warp", chroma: "Chroma", glow: "Glow", palette: "Palette",
     hue: "Hue", saturation: "Saturation", brightness: "Master", contrast: "Contrast",
     video_mix: "Camera mix", cam_view: "360 view", cam_spin: "360 spin", react: "Audio react",
-    strobe: "Strobe", invert: "Invert",
+    strobe: "Strobe", invert: "Invert", ap_intensity: "Intensity",
   };
   const ACTION_LABELS = {
     next: "Next ▶", prev: "◀ Prev", random_preset: "Random preset", randomize: "Randomize FX",
@@ -40,11 +40,11 @@
       this.mapName = store.get("mapName", "akai_mpd32");
       this.loadMap();
       this.snapshots = store.get("snapshots", {});
-      this.settings = Object.assign({ quality: "auto", pickup: false, autopilotBeats: 32, autopilotSeconds: 30 },
-                                    store.get("settings", {}));
+      this.settings = Object.assign({ quality: "auto", pickup: false }, store.get("settings", {}));
+      this.pilot = new Prism.Autopilot(this.params, D.kaleidoChaos, D.palettes.length);
+      this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
 
       this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0 };
-      this.autopilot = false;
       this.shift = this.frozen = this.flashHeld = false;
       this.blackoutTarget = 0;
       this.videoActive = true;
@@ -53,7 +53,7 @@
       this.learning = null;
       this.picked = new Set();
       this.clockTicks = 0;
-      this.apBeats = 0; this.apSince = 0; this.lastBeatCount = 0;
+      this.lastBeatCount = 0;
       this.fps = 60;
 
       this.buildPanel();
@@ -109,7 +109,7 @@
       }
       this.params.loadPreset(this.preset.params);
       this.picked.clear();
-      this.apBeats = 0; this.apSince = 0;
+      this.pilot?.startPreset();
       this.notify(this.preset.name);
       this.refreshPresetButtons();
       this.refreshLabels();
@@ -128,7 +128,11 @@
         this.selectPreset(i);
       } else if (action === "randomize") { this.params.randomize(); this.picked.clear(); }
       else if (action === "reset") { this.params.loadPreset(this.preset.params); this.picked.clear(); }
-      else if (action === "autopilot") { this.autopilot = !this.autopilot; this.notify(`autopilot ${this.autopilot ? "on" : "off"}`); }
+      else if (action === "autopilot") {
+        this.pilot.enabled = !this.pilot.enabled;
+        if (this.pilot.enabled) { this.pilot.homeHue = null; this.pilot.startPreset(); }
+        this.notify(`autopilot ${this.pilot.enabled ? "on" : "off"}`);
+      }
       else if (action === "blackout") this.blackoutTarget = 1 - this.blackoutTarget;
       else if (action === "freeze") this.frozen = !this.frozen;
       else if (action === "tap") this.audio.triggerBeat();
@@ -145,7 +149,7 @@
     setState(action, on) {
       if (action === "blackout") this.blackoutTarget = on ? 1 : 0;
       else if (action === "freeze") this.frozen = on;
-      else if (action === "autopilot") { if (this.autopilot !== on) this.doAction("autopilot"); }
+      else if (action === "autopilot") { if (this.pilot.enabled !== on) this.doAction("autopilot"); }
       else if (action === "video") this.videoActive = on;
       else if (action === "hud") this.showHud = on;
       else if (action === "shift") this.shift = on;
@@ -160,6 +164,7 @@
           this.picked.add(target);
         }
         p.setNorm(value);
+        this.pilot.touch(target);
         return;
       }
       const latching = source === "cc" || source === "toggle_pad";
@@ -339,12 +344,9 @@
     tickAutopilot(dt) {
       const beats = this.audio.beatCount - this.lastBeatCount;
       this.lastBeatCount = this.audio.beatCount;
-      if (!this.autopilot) return;
-      this.apBeats += beats;
-      this.apSince += dt;
-      if (this.apBeats >= this.settings.autopilotBeats || this.apSince >= this.settings.autopilotSeconds) {
-        this.doAction("random_preset");
-        this.params.randomize();
+      for (const event of this.pilot.update(dt, beats)) {
+        if (event === "switch") { this.doAction("random_preset"); this.pilot.onSwitched(); }
+        else if (event === "flash") this.st.flash = 0.7;
       }
     }
 
@@ -410,10 +412,14 @@
         row.innerHTML = `<span class="lbl"></span><input type="range" min="0" max="1" step="0.001"><output></output>`;
         row.querySelector(".lbl").textContent = PARAM_LABELS[p.name] || p.name;
         const input = row.querySelector("input");
-        input.oninput = () => p.setNorm(+input.value);
+        input.oninput = () => {
+          p.setNorm(+input.value);
+          if (p.name === "ap_intensity") store.set("apIntensity", p.targetValue);
+          else this.pilot.touch(p.name); // autopilot leaves knobs you've moved alone until the next switch
+        };
         row.appendChild(this.learnButton(p.name));
         if (p.name.startsWith("cam_")) row.classList.add("cam360");
-        knobs.appendChild(row);
+        (p.name === "ap_intensity" ? $("#pilotKnob") : knobs).appendChild(row);
         this.sliders[p.name] = { row, input, out: row.querySelector("output"), lbl: row.querySelector(".lbl") };
       }
 
@@ -421,6 +427,7 @@
       const acts = $("#actions");
       this.actionButtons = {};
       for (const a of D.actions.filter((a) => !a.startsWith("snapshot:"))) {
+        if (a === "autopilot") continue; // lives in the Autopilot section
         const b = document.createElement("button");
         b.className = "action";
         b.textContent = ACTION_LABELS[a] || a;
@@ -432,6 +439,12 @@
         acts.appendChild(b);
         this.actionButtons[a] = b;
       }
+
+      // autopilot toggle
+      const pb = $("#pilotBtn");
+      pb.onclick = () => this.doAction("autopilot");
+      pb.appendChild(this.learnButton("autopilot"));
+      this.actionButtons.autopilot = pb;
 
       // snapshots
       const snaps = $("#snapshots");
@@ -517,10 +530,11 @@
     }
     refreshMapUi() { $("#mapState").textContent = this.mapEdited ? "includes your MIDI-learn changes" : "original"; }
     refreshChrome() {
-      const on = { autopilot: this.autopilot, blackout: this.blackoutTarget > 0, freeze: this.frozen, shift: this.shift,
+      const on = { autopilot: this.pilot.enabled, blackout: this.blackoutTarget > 0, freeze: this.frozen, shift: this.shift,
                    video: this.videoActive, hud: this.showHud };
       for (const [a, b] of Object.entries(this.actionButtons || {})) b.classList.toggle("on", !!on[a]);
       $("#hud").hidden = !this.showHud;
+      $("#pilotBtn").firstChild.textContent = this.pilot.enabled ? "Autopilot ON" : "Autopilot off";
     }
     refreshLive() {
       for (const p of this.params.list) {
@@ -539,8 +553,12 @@
       $("#midiLast").textContent = this.midi.last;
       $("#audioStatus").textContent = a.fake ? "demo beat" : a.status === "live" ? a.label : a.status;
       $("#camStatus").textContent = this.camStatus || "off";
+      const I = this.pilot.intensity;
+      $("#pilotInfo").textContent = this.pilot.enabled
+        ? `next preset in ${this.pilot.beatsUntilSwitch()} beats · knobs gliding${I > 0.4 ? " · beat jumps" : ""}${I > 0.8 ? " · flashes" : ""}`
+        : `switches every ${this.pilot.switchBeats()} beats; knobs keep moving in between`;
       $("#hud").innerHTML = `<b>${this.preset.name}</b> · ${Math.round(this.fps)} fps` +
-        (this.autopilot ? " · AUTOPILOT" : "") + (this.frozen ? " · FROZEN" : "") +
+        (this.pilot.enabled ? ` · AUTOPILOT ${Math.round(this.pilot.intensity * 100)}%` : "") + (this.frozen ? " · FROZEN" : "") +
         (this.blackoutTarget ? " · BLACKOUT" : "") + (this.shift ? " · SHIFT" : "");
     }
   }

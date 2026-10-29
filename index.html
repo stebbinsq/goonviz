@@ -73,6 +73,9 @@
   #snapshots { grid-template-columns: repeat(4, 1fr); }
   .action, .snap { position: relative; background: var(--panel2); border: 1px solid var(--line); border-radius: 7px; padding: 7px 22px 7px 8px; cursor: pointer; text-align: left; }
   .action.on { border-color: var(--gold); color: var(--gold); }
+  .pilot { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center; }
+  .pilot .knob { grid-template-columns: 62px 1fr 40px 22px; margin: 0; }
+  #pilotBtn.on { background: #2a2208; }
   .snap.filled { border-color: var(--accent2); }
   .learn { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; padding: 0; border-radius: 4px;
     border: 1px solid var(--line); background: transparent; color: var(--dim); font-size: 10px; cursor: pointer; opacity: .55; }
@@ -134,6 +137,13 @@
     <div class="status" id="midiLast"></div>
     <div class="field" id="cam360row" hidden><span>360 cam</span><div class="hint">360 view & spin knobs are below</div></div>
 
+    <h2>Autopilot</h2>
+    <div class="pilot">
+      <button class="action" id="pilotBtn">Autopilot off</button>
+      <div id="pilotKnob"></div>
+    </div>
+    <div class="status" id="pilotInfo" style="margin-left:0"></div>
+
     <h2>Actions</h2>
     <div id="actions"></div>
 
@@ -178,11 +188,12 @@
 </div>
 
 <video id="cam" playsinline muted hidden></video>
-<script src="bundle.js"></script>
-<script src="js/params.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/midi.js"></script>
-<script src="js/engine.js"></script>
-<script src="js/app.js"></script>
+<script src="bundle.js?v=1a857ee7e6"></script>
+<script src="js/params.js?v=1a857ee7e6"></script>
+<script src="js/audio.js?v=1a857ee7e6"></script>
+<script src="js/midi.js?v=1a857ee7e6"></script>
+<script src="js/autopilot.js?v=1a857ee7e6"></script>
+<script src="js/engine.js?v=1a857ee7e6"></script>
+<script src="js/app.js?v=1a857ee7e6"></script>
 </body>
 </html>
