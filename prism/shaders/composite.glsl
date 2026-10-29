@@ -10,6 +10,7 @@ uniform float uTime;
 uniform float uFeedback, uFbZoom, uFbRot, uFbHue;
 uniform float uKaleido, uWarp, uChroma, uGlow;
 uniform float uExposure;  // auto-exposure: < 1 when the scene is too bright (set by the engine)
+uniform float uTransition; // 1 right after a preset change, fading to 0: the old frame melts into the new
 uniform float uVideoMix, uVideoOn, uVideo360, uCamView, uCamYaw;
 uniform float uBeat, uBass;
 
@@ -59,6 +60,16 @@ void main() {
     fb = max(fb * uFeedback - 0.004, 0.0);  // the -0.004 stops 8-bit trails getting stuck
 
     vec3 c = max(sc, fb);
+
+    // Preset transition: keep the previous frame, drifting slightly in and around, and let the new
+    // scene take over as uTransition falls to 0. Cheaper than rendering two presets at once.
+    if (uTransition > 0.001) {
+        float t = uTransition * uTransition * (3.0 - 2.0 * uTransition);
+        vec2 m = (vUV - 0.5) * vec2(asp, 1.0);
+        m = rot(0.01 * t) * m * (1.0 - 0.012 * t);
+        vec3 held = texture(uPrev, mirrorUV(m / vec2(asp, 1.0) + 0.5)).rgb;
+        c = mix(c, held, t * 0.96);
+    }
 
     if (uVideoMix > 0.001 && uVideoOn > 0.5) {
         vec2 vuv = uVideo360 > 0.5 ? project360(vUV, asp, uCamView, uCamYaw) : vUV;

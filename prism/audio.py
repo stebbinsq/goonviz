@@ -16,7 +16,7 @@ FFT_BINS = 128
 
 
 class AudioInput:
-    def __init__(self, device=None, samplerate=48000, fake=False, gain=1.0, noise_floor=0.004,
+    def __init__(self, device=None, samplerate=48000, fake=False, gain=1.0, noise_floor=0.015,
                  fallback_to_default=True):
         self.device = device
         self.fallback_to_default = fallback_to_default

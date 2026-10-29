@@ -29,6 +29,7 @@ class Autopilot:
         self.base = {}
         self.dest = {}
         self.touched = set()
+        self.stepped = set()
         self.home_hue = None  # your hue: autopilot wobbles around it (reset when autopilot is switched on)
         self._reset_counters()
 
@@ -44,8 +45,10 @@ class Autopilot:
         self.beats_since_switch = self.beats_since_drift = 0
         self.time_since_switch = self.time_since_drift = 0.0
 
-    def start_preset(self):
-        """Call after a preset loads: its values become the centre the knobs drift around."""
+    def start_preset(self, stepped=()):
+        """Call after a preset loads: its values become the centre the knobs drift around.
+        stepped: knobs the preset rounds to whole numbers; they stay put (gliding them makes shapes pop)."""
+        self.stepped = set(stepped)
         if self.home_hue is None or "hue" in self.touched:
             self.home_hue = self.p["hue"].target
         self.base = {n: self.p[n].target for n in DRIFT}
@@ -61,7 +64,7 @@ class Autopilot:
     def _retarget(self):
         amount = 0.15 + 0.85 * self.intensity  # how far from the preset's own look the knobs may wander
         for n in DRIFT:
-            if n in self.touched:
+            if n in self.touched or n in self.stepped:
                 continue
             prm = self.p[n]
             lo, hi = prm.chaos or (prm.lo, prm.hi)
@@ -112,4 +115,4 @@ class Autopilot:
             self.p["palette"].set_value(self.rng.randrange(self.palette_count))
         if self.rng.random() < I * 0.7:
             self.p["kaleido"].set_value(self.rng.choice(self.kaleido_chaos))
-        self.start_preset()
+        self.start_preset(self.stepped)

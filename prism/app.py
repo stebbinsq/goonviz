@@ -18,12 +18,14 @@ DEFAULT_CONFIG = {
     "render_scale": 0.5,
     "max_fps": 60,
     "start_preset": 0,
-    "audio": {"device": None, "samplerate": 48000, "gain": 1.0, "fake": False, "noise_floor": 0.004},
+    "audio": {"device": None, "samplerate": 48000, "gain": 1.0, "fake": False, "noise_floor": 0.015},
     "video": {"source": None, "width": 640, "height": 360, "capture_size": None},
     "midi": {"port": None, "map": "maps/akai_mpd32.json", "clock_beats": True, "pickup": False},
     "autopilot": {"enabled": False, "intensity": 0.5},
     "snapshots": "snapshots.json",
 }
+
+TRANSITION_SECONDS = 1.2  # how long the old preset takes to melt into the new one
 
 ACTION_ITEMS = ["next", "prev", "random_preset", "randomize", "reset", "autopilot", "blackout",
                 "flash", "freeze", "shift", "tap", "video", "hud"] + [f"snapshot:{i}" for i in range(8)]
@@ -129,7 +131,7 @@ class App:
         self.flash_held = False
         self.message, self.message_until = "", 0.0
         self.state = {"time": 0.0, "pulse": 0.0, "real_time": 0.0, "flash": 0.0, "blackout": 0.0,
-                      "cam_yaw": 0.0}
+                      "cam_yaw": 0.0, "transition": 0.0}
         self.fps = 0.0
         self.last_reload_check = 0.0
         self.last_beat_count = 0
@@ -153,11 +155,13 @@ class App:
             preset = self.presets[(index + step) % n]
             if preset.program:
                 break
+        if hasattr(self, "state") and self.presets[self.preset_index] is not preset:
+            self.state["transition"] = 1.0   # melt from the old preset into this one
         self.preset_index = self.presets.index(preset)
         self.params.load_preset(preset.params)
         self.picked.clear()
         if hasattr(self, "pilot"):
-            self.pilot.start_preset()
+            self.pilot.start_preset(preset.stepped)
         self.notify(preset.name)
 
     @property
@@ -213,7 +217,7 @@ class App:
             self.pilot.enabled = not self.pilot.enabled
             if self.pilot.enabled:
                 self.pilot.home_hue = None
-                self.pilot.start_preset()
+                self.pilot.start_preset(self.preset.stepped)
             self.notify(f"autopilot {'on' if self.pilot.enabled else 'off'}")
         elif action == "blackout":
             self.blackout_target = 1.0 - self.blackout_target
@@ -430,6 +434,7 @@ class App:
             st["cam_yaw"] = (st["cam_yaw"] + dt * P.v("cam_spin") * 0.6) % (2.0 * math.pi)
             st["flash"] = 1.0 if self.flash_held else st["flash"] * math.exp(-dt * 10.0)
             st["blackout"] += (self.blackout_target - st["blackout"]) * (1.0 - math.exp(-dt * 4.0))
+            st["transition"] = max(0.0, st["transition"] - dt / TRANSITION_SECONDS)
 
             if now - self.last_reload_check > 1.0:  # live-code presets: save the .glsl and it reloads
                 self.last_reload_check = now

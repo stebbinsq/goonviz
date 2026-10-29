@@ -259,7 +259,10 @@
     "74": "preset:23",
     "75": "preset:24",
     "76": "preset:25",
-    "77": "preset:26"
+    "77": "preset:26",
+    "78": "preset:27",
+    "79": "preset:28",
+    "80": "preset:29"
   },
   "mmc": {
     "rewind": "prev",

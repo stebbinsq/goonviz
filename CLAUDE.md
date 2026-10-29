@@ -14,8 +14,13 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 27 presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
-  "Jade Cicada"-style organic visuals). 10 palettes.
+- 30 presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
+  "Jade Cicada"-style organic visuals), 3D raymarched set (28–30, Tipper-inspired: rendered-looking fractal
+  worlds with beat-snapped camera moves). 10 palettes.
+- Glitch fixes: preset changes melt via uTransition in composite.glsl; autopilot never glides knobs a shader
+  rounds (stepped_knobs / steppedKnobs scan for floor( / int( lines); audio noise floor 0.015 so quiet laptop
+  mics aren't auto-levelled into fake hits. The web exposure readback is async (PBO + fence); web adaptive
+  resolution lives in App.adaptResolution (snaps the refresh estimate to real display rates).
 - Autopilot lives in prism/autopilot.py and web/js/autopilot.js (ports of each other); intensity is the
   `ap_intensity` param. Auto-exposure (Engine._meter / Engine.meter) reads the composited frame's 1x1 mip.
 - tools/build_web.py stamps `?v=<hash>` onto script tags so browsers never mix stale and fresh files.

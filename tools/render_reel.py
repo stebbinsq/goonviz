@@ -4,6 +4,7 @@ including a few live-style knob moves (kaleido, palette, trails).
 
     python tools/render_reel.py                      # -> preview/prism_demo.mp4
     python tools/render_reel.py --seconds 6 --size 1920x1080
+    python tools/render_reel.py 28_fractal_cathedral 29_mandelbulb_bloom --out preview/new.mp4
 
 Needs: pip install moderngl numpy imageio-ffmpeg
 """
@@ -40,6 +41,7 @@ def main():
     ap.add_argument("--seconds", type=float, default=4.0, help="per preset")
     ap.add_argument("--out", default="preview/prism_demo.mp4")
     ap.add_argument("--include-video", action="store_true", help="also show the camera presets")
+    ap.add_argument("names", nargs="*", help="only these presets (file names without .glsl)")
     args = ap.parse_args()
 
     import imageio_ffmpeg
@@ -49,6 +51,8 @@ def main():
     presets = load_presets()
     if not args.include_video:
         presets = [p for p in presets if "(video)" not in p.name]
+    if args.names:
+        presets = [p for p in presets if p.key in args.names]
     engine = Engine(ctx, (w, h), scale=1.0, presets=presets)
     target = ctx.framebuffer([ctx.texture((w, h), 4)])
     audio = AudioInput(fake=True)

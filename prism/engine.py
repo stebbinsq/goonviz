@@ -38,6 +38,18 @@ void main() {
 """
 
 META_RE = re.compile(r"//\s*@preset\s*(\{.*\})")
+KNOB_RE = re.compile(r"\bu([ABCD])\b")
+
+
+def stepped_knobs(source):
+    """Knobs a preset rounds to whole numbers (petal counts, polygon sides...). Gliding those makes the
+    shape pop, so autopilot leaves them alone. Any line with floor( or int( counts."""
+    found = set()
+    for line in source.splitlines():
+        code = line.split("//")[0]
+        if "floor(" in code or "int(" in code:
+            found.update(k.lower() for k in KNOB_RE.findall(code))
+    return found
 
 
 def _read(name):
@@ -79,6 +91,7 @@ class Preset:
         self.name = meta.get("name", self.key.replace("_", " ").title())
         self.params = meta.get("params", {})
         self.labels = meta.get("labels", {})
+        self.stepped = stepped_knobs(self.source)
 
     def changed_on_disk(self):
         try:
@@ -212,14 +225,14 @@ class Engine:
         if not self.auto_exposure:
             self.exposure = 1.0
             return
-        if self._frame % 6:
+        if self._frame % 15:  # the readback stalls the GPU briefly, so keep it rare on the Pi
             return
         tex.build_mipmaps()
         tex.filter = (moderngl.LINEAR, moderngl.LINEAR)  # build_mipmaps switches to mip filtering; undo
         level = int(np.floor(np.log2(max(self.internal_size))))
         r, g, b = tex.read(level=level)[:3]
         mean = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
-        self.exposure *= (0.32 / mean) ** 0.35 if mean > 0.32 else 1.04
+        self.exposure *= (0.32 / mean) ** 0.5 if mean > 0.32 else 1.08
         self.exposure = min(1.0, max(0.35, self.exposure))
 
     @staticmethod
@@ -289,6 +302,7 @@ class Engine:
         s(cp, "uChroma", P.v("chroma"))
         s(cp, "uGlow", P.v("glow"))
         s(cp, "uExposure", self.exposure)
+        s(cp, "uTransition", state.get("transition", 0.0))
         s(cp, "uVideoMix", P.v("video_mix"))
         s(cp, "uVideoOn", 1.0 if self.video_on else 0.0)
         s(cp, "uVideo360", 1.0 if self.video_360 else 0.0)

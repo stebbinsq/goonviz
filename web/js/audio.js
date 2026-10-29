@@ -17,7 +17,9 @@
       this.status = "off";
       this.fake = false;
       this.gain = 1;
-      this.noiseFloor = 0.004;
+      // Auto-gain never amplifies past this level: a quiet room through a laptop mic must not be
+      // boosted until typing and talking look like bass hits.
+      this.noiseFloor = 0.015;
       this.externalBeatsUntil = 0; // while MIDI clock runs, it supplies the beats
       this._peaks = [1e-3, 1e-3, 1e-3, 1e-3];
       this._specPeak = 1e-3;

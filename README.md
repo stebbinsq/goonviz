@@ -30,7 +30,13 @@ Before a show:
 Changes and snapshots are saved in that Mac's Chrome. Use **Export settings** / **Import** to copy them to your other Mac.
 
 **Quality: Auto** renders at about 1440 px wide, or about 960 px on Intel graphics (Intel MacBook Pros), and upscales to the
-projector. Bloom and colour grading always run at full resolution.
+projector. Bloom and colour grading always run at full resolution. On top of that, **adaptive resolution** watches the
+frame rate: if frames run late it renders slightly fewer pixels, and steps back up when there's headroom, so heavy
+presets stay smooth. The fps readout shows `actual/display` (e.g. `60/60`). A 60 Hz screen or projector can't show
+more than 60 fps; on a 120 Hz display GoonViz will run at 120 when the preset allows.
+
+The **3D set** (Fractal Cathedral, Mandelbulb Bloom, Chrome Lattice) is raymarched: full 3D scenes with lighting.
+They're the heaviest presets and are meant for the Mac; on a Pi they'll crawl.
 
 ### Editing presets for the web version
 
@@ -141,7 +147,7 @@ If you remap anything, regenerate it with `python tools/make_cheatsheet.py`.
 
 The main layout:
 - **Pad bank A:** presets 1–16. **Pad bank B:** preset 17, random, randomize, reset, prev/next, tap, flash, and snapshots 1–8.
-- **Pad bank C:** the kaleidoscopic set (18–23) and the Jade set (24–27).
+- **Pad bank C:** the kaleidoscopic set (18–23), the Jade set (24–27) and the 3D set (28–30).
 - **Control bank A:**
   - Knobs: A–D, speed, zoom, palette, hue.
   - Faders: trails ×4, glow, kaleido, camera mix, MASTER.
@@ -193,6 +199,10 @@ Turn it on (switch S1, ▶ PLAY on the MPD32, **A** on the keyboard, or the pane
 Between switches it keeps gliding A–D, trails, warp, glow, zoom, chroma and speed toward new targets, and
 wobbles the hue around wherever you left it. Any knob you move yourself is left alone until the next switch,
 so you can steer one thing while autopilot handles the rest.
+
+Presets **melt** into each other over about a second instead of cutting. Knobs a preset uses as a count
+(petals, polygon sides, chambers: anything it rounds to a whole number) are never glided by autopilot,
+because the shape would pop each time the count changed.
 
 **Auto-exposure** watches the average brightness of the picture and dims it smoothly if a combination washes
 out. It never brightens, so dark presets are untouched and flashes still hit full white.
