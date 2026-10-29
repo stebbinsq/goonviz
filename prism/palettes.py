@@ -14,6 +14,8 @@ PALETTES = [
     ("Iridescent",     ["#0d0d1f", "#ff7eb3", "#7afcff", "#feff9c", "#b388ff"]),
     ("Forest Spirit",  ["#03100b", "#2d6a4f", "#95d5b2", "#ffd166", "#ef476f"]),
     ("Ultraviolet",    ["#08000f", "#4b0082", "#9d4edd", "#ff9e00", "#ff4d6d"]),
+    ("Jade",           ["#020a08", "#0d5c47", "#3fcf9a", "#f0c35a", "#9b7bff"]),
+    ("Cicada",         ["#030705", "#245c3f", "#9fe8b0", "#e8a83a", "#c44569"]),
 ]
 
 

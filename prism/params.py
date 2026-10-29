@@ -24,7 +24,7 @@ PARAM_DEFS = [
     ("warp",       0.0, 1.0,  0.0,  dict(scope="preset", chaos=(0.0, 0.4))),
     ("chroma",     0.0, 1.0,  0.15, dict(scope="preset", chaos=(0.0, 0.5))),
     ("glow",       0.0, 1.0,  0.45, dict(scope="preset", chaos=(0.25, 0.8))),
-    ("palette",    0.0, 7.0,  0.0,  dict(scope="preset", int=True)),
+    ("palette",    0.0, 9.0,  0.0,  dict(scope="preset", int=True)),   # index into prism/palettes.py
     ("hue",        0.0, 1.0,  0.0,  dict(scope="master")),
     ("saturation", 0.0, 2.0,  1.0,  dict(scope="master")),
     ("brightness", 0.0, 2.0,  1.0,  dict(scope="master")),
@@ -34,6 +34,7 @@ PARAM_DEFS = [
     ("cam_spin",  -1.0, 1.0,  0.15, dict(scope="master")),
     ("react",      0.0, 2.0,  1.0,  dict(scope="master")),
     ("strobe",     0.0, 1.0,  0.0,  dict(scope="master")),
+    ("ap_intensity", 0.0, 1.0, 0.5, dict(scope="master")),   # autopilot: how often and how wild
     ("invert",     0.0, 1.0,  0.0,  dict(scope="master")),
 ]
 
@@ -124,7 +125,7 @@ class ParamSet:
             if p.chaos:
                 p.set_value(rng.uniform(*p.chaos))
         self.by_name["kaleido"].set_value(rng.choice(KALEIDO_CHAOS))
-        self.by_name["palette"].set_value(rng.randrange(8))
+        self.by_name["palette"].set_value(rng.randrange(int(self.by_name["palette"].hi) + 1))
 
     def snapshot(self):
         return {p.name: round(p.target_value, 4) for p in self.list}

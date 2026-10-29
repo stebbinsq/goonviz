@@ -116,6 +116,9 @@ class Engine:
         self.video_360 = False
 
         self.palette = np.array(PALETTE_RGB[0], dtype="f4")
+        self.exposure = 1.0
+        self.auto_exposure = True
+        self._frame = 0
         self.scale = scale
         self.cur = 0
         self.resize(size)
@@ -201,6 +204,24 @@ class Engine:
 
     # ---- render --------------------------------------------------------
 
+    def _meter(self, tex):
+        """Auto-exposure on the composited frame (scene + bloom + trails): its 1x1 mip is the average
+        colour. Above a mean luma of 0.32 the exposure steps down; below it creeps back up to 1.
+        It never brightens past 1, so dark presets are untouched."""
+        self._frame += 1
+        if not self.auto_exposure:
+            self.exposure = 1.0
+            return
+        if self._frame % 6:
+            return
+        tex.build_mipmaps()
+        tex.filter = (moderngl.LINEAR, moderngl.LINEAR)  # build_mipmaps switches to mip filtering; undo
+        level = int(np.floor(np.log2(max(self.internal_size))))
+        r, g, b = tex.read(level=level)[:3]
+        mean = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
+        self.exposure *= (0.32 / mean) ** 0.35 if mean > 0.32 else 1.04
+        self.exposure = min(1.0, max(0.35, self.exposure))
+
     @staticmethod
     def _set(prog, name, value):
         if name in prog:
@@ -267,6 +288,7 @@ class Engine:
         s(cp, "uWarp", P.v("warp"))
         s(cp, "uChroma", P.v("chroma"))
         s(cp, "uGlow", P.v("glow"))
+        s(cp, "uExposure", self.exposure)
         s(cp, "uVideoMix", P.v("video_mix"))
         s(cp, "uVideoOn", 1.0 if self.video_on else 0.0)
         s(cp, "uVideo360", 1.0 if self.video_360 else 0.0)
@@ -275,6 +297,7 @@ class Engine:
         s(cp, "uBeat", audio.beat * min(1.0, react))
         s(cp, "uBass", min(1.0, audio.bass * react))
         self.comp_vao.render(moderngl.TRIANGLES)
+        self._meter(out_tex)
 
         # Display
         target = target or ctx.screen

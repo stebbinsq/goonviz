@@ -126,7 +126,7 @@ journalctl -u prism -f                    # logs
 | `midi.map` | Which mapping file to use. Default `maps/akai_mpd32.json`; also `generic.json`, `nanokontrol2.json`, or your own |
 | `midi.clock_beats` | If your DJ gear sends MIDI clock, use it for beats instead of audio detection |
 | `midi.pickup` | Soft takeover: a knob does nothing until it reaches the current value (no jumps after preset changes) |
-| `autopilot` | Auto-switch presets every N beats (or seconds), optionally randomizing FX |
+| `autopilot` | `enabled` (start with autopilot on) and `intensity` (0 calm … 1 wild) |
 
 Everything also works as a flag: `run.py --windowed --video 0 --fake-audio --preset wormhole`.
 
@@ -141,11 +141,13 @@ If you remap anything, regenerate it with `python tools/make_cheatsheet.py`.
 
 The main layout:
 - **Pad bank A:** presets 1–16. **Pad bank B:** preset 17, random, randomize, reset, prev/next, tap, flash, and snapshots 1–8.
+- **Pad bank C:** the kaleidoscopic set (18–23) and the Jade set (24–27).
 - **Control bank A:**
   - Knobs: A–D, speed, zoom, palette, hue.
   - Faders: trails ×4, glow, kaleido, camera mix, MASTER.
   - Switches: autopilot, freeze, camera, strobe, invert, overlay, BLACKOUT, SHIFT.
-- **Control bank B:** warp, chroma, saturation, contrast, audio react…, plus the 360 view and spin (faders F5, F6).
+- **Control bank B:** warp, chroma, saturation, contrast, audio react…, the 360 view and spin (faders F5, F6), and
+  **autopilot intensity** (fader F7).
 - **Transport:** ◀◀ / ▶▶ prev/next, ■ blackout, ▶ autopilot, ● randomize (sent as MMC, the default).
 
 The ArkaosVJ preset makes pads latch (one hit = note on, the next hit = note off). Prism counts
@@ -177,6 +179,24 @@ Some caveats:
   Insta360 entry appears, Prism falls back to the default input, so plug in a USB audio interface.
 - **Power and heat:** long sessions on USB power can make the camera hot. Keep it ventilated.
 
+## Autopilot
+
+Turn it on (switch S1, ▶ PLAY on the MPD32, **A** on the keyboard, or the panel button) and GoonViz plays itself.
+**Intensity** (bank B fader F7, or the slider in the panel) sets how hard:
+
+| | calm (0) | middle (0.5) | wild (1) |
+|---|---|---|---|
+| preset switches | every 64 beats | every 36 beats | every 8 beats |
+| knobs | slow, small drifts | wider sweeps | fast, full-range |
+| on the beat | nothing | nothing | kaleidoscope and palette jumps, flashes |
+
+Between switches it keeps gliding A–D, trails, warp, glow, zoom, chroma and speed toward new targets, and
+wobbles the hue around wherever you left it. Any knob you move yourself is left alone until the next switch,
+so you can steer one thing while autopilot handles the rest.
+
+**Auto-exposure** watches the average brightness of the picture and dims it smoothly if a combination washes
+out. It never brightens, so dark presets are untouched and flashes still hit full white.
+
 ## Controls
 
 Every preset has four of its own knobs (**a, b, c, d**; the HUD shows what each one does for
@@ -185,7 +205,7 @@ that preset) plus shared FX and master controls:
 - **speed, zoom**
 - **feedback, fb_zoom, fb_rotate, fb_hue**: Milkdrop-style trails, tunnels and hue drift
 - **kaleido** (0 = off, 2–12 mirror segments), **warp**, **chroma** (RGB split)
-- **glow**: bloom haze; **palette**: 8 curated palettes that crossfade when switched
+- **glow**: bloom haze; **palette**: 10 curated palettes (including Jade and Cicada) that crossfade when switched
 - **hue, saturation, brightness, contrast, invert**: master grading, kept when presets change
 - **video_mix**: blend the camera over any preset
 - **cam_view, cam_spin**: 360-camera projection (flat / look-around / tiny planet / rabbit hole) and pan

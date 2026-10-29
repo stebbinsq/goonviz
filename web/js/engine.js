@@ -89,6 +89,10 @@ void main() {
       this.lastVideoTime = -1;
       this.cur = 0;
       this.scale = 0.75;
+      this.exposure = 1;
+      this.autoExposure = true;
+      this.frameNo = 0;
+      this.meterPx = new Uint8Array(4);
       this.screenSize = [0, 0];
     }
 
@@ -171,9 +175,22 @@ void main() {
       for (const t of this._owned || []) (t instanceof WebGLTexture ? gl.deleteTexture(t) : gl.deleteFramebuffer(t));
       this.sceneTex = this.texture(gl.RGBA8, iw, ih, gl.LINEAR, true);
       this.sceneFbo = this.target(this.sceneTex);
-      this.compTex = [this.texture(gl.RGBA8, iw, ih, gl.LINEAR), this.texture(gl.RGBA8, iw, ih, gl.LINEAR)];
+      // comp textures get a mip chain (sampled without mips) so the meter can read their 1x1 average
+      this.compTex = [0, 1].map(() => {
+        const t = this.texture(gl.RGBA8, iw, ih, gl.LINEAR, true);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        return t;
+      });
       this.compFbo = this.compTex.map((t) => this.target(t));
-      this._owned = [this.sceneTex, this.sceneFbo, ...this.compTex, ...this.compFbo];
+      // auto-exposure meters: framebuffers on each comp texture's 1x1 mip level (its average colour)
+      const top = Math.floor(Math.log2(Math.max(iw, ih)));
+      this.meterFbo = this.compTex.map((t) => {
+        const fbo = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, top);
+        return fbo;
+      });
+      this._owned = [this.sceneTex, this.sceneFbo, ...this.compTex, ...this.compFbo, ...this.meterFbo];
     }
 
     // ---- per-frame inputs ---------------------------------------------
@@ -205,6 +222,23 @@ void main() {
     }
 
     // ---- render --------------------------------------------------------
+
+    // Same as Engine._meter in prism/engine.py: measure the composited frame's average brightness;
+    // above a mean luma of 0.32 step the exposure down, below it creep back up to 1 (never brighter).
+    meter(i) {
+      if (!this.autoExposure) { this.exposure = 1; return; }
+      if (++this.frameNo % 6) return;
+      const gl = this.gl;
+      gl.bindTexture(gl.TEXTURE_2D, this.compTex[i]);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.meterFbo[i]);
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, this.meterPx);
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+      const [r, g, b] = this.meterPx;
+      const mean = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      this.exposure *= mean > 0.32 ? Math.pow(0.32 / mean, 0.35) : 1.04;
+      this.exposure = Math.min(1, Math.max(0.35, this.exposure));
+    }
 
     set(p, name, ...v) {
       const loc = p.uniforms[name];
@@ -287,6 +321,7 @@ void main() {
       s(c, "uWarp", P.v("warp"));
       s(c, "uChroma", P.v("chroma"));
       s(c, "uGlow", P.v("glow"));
+      s(c, "uExposure", this.exposure);
       s(c, "uVideoMix", P.v("video_mix"));
       s(c, "uVideoOn", videoOn);
       s(c, "uVideo360", v360);
@@ -295,6 +330,7 @@ void main() {
       s(c, "uBeat", beat);
       s(c, "uBass", bass);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      this.meter(1 - this.cur);
 
       // Display
       const d = this.disp;

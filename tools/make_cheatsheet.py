@@ -27,11 +27,11 @@ PARAM_INFO = {
     "fb_rotate": ("Trail spin", "swirl left / right"), "fb_hue": ("Trail hue", "rainbow drift"),
     "kaleido": ("Kaleido", "off → 12 mirrors"), "warp": ("Warp", "liquid distortion"),
     "chroma": ("Chroma", "RGB split"), "glow": ("Glow", "bloom haze"),
-    "palette": ("Palette", "8 colour sets"), "hue": ("Hue", "master colour shift"),
+    "palette": ("Palette", "10 colour sets"), "hue": ("Hue", "master colour shift"),
     "saturation": ("Saturation", "grey → vivid"), "brightness": ("MASTER", "brightness"),
     "contrast": ("Contrast", ""), "video_mix": ("Camera mix", "blend live video"),
     "react": ("Audio react", "how hard sound hits"), "strobe": ("Strobe", "flash on beats"),
-    "invert": ("Invert", "negative image"),
+    "invert": ("Invert", "negative image"), "ap_intensity": ("Autopilot", "intensity: calm → wild"),
     "cam_view": ("360 view", "flat · look · planet · hole"), "cam_spin": ("360 spin", "pan the room ◀ ▶"),
 }
 ACTION_INFO = {
@@ -69,10 +69,12 @@ def lookup(table, num):
     return table.get(str(num)) or next((v for k, v in table.items() if k.endswith(f":{num}")), None)
 
 
-def pad_grid(notes, note_map, presets, bank):
-    # MPC layout: pad 1 bottom-left, pads 13-16 across the top
+def pad_grid(notes, note_map, presets, bank, compact=False):
+    # MPC layout: pad 1 bottom-left, pads 13-16 across the top. compact: only rows with something mapped
     rows = []
     for row in (3, 2, 1, 0):
+        if compact and not any(lookup(note_map, notes[row * 4 + c]) for c in range(4)):
+            continue
         cells = []
         for col in range(4):
             idx = row * 4 + col
@@ -92,6 +94,8 @@ def pad_grid(notes, note_map, presets, bank):
 def control_bank(bank, nums, cc_map, presets):
     out = []
     for group, letter, shape in (("knobs", "K", "knob"), ("faders", "F", "fader"), ("switches", "S", "switch")):
+        if not any(lookup(cc_map, n) for n in nums[group]):
+            continue  # nothing mapped on this row: leave it off the sheet
         cells = "".join(cell(*label(lookup(cc_map, n), presets), f"{letter}{i + 1}", shape)
                         for i, n in enumerate(nums[group]))
         out.append(f'<div class="rowlabel">{group}</div><div class="row8">{cells}</div>')
@@ -164,10 +168,15 @@ def build(map_path):
     cc_map, note_map, mmc = m.get("cc", {}), m.get("note", {}), m.get("mmc", {})
     name = m.get("controller", os.path.splitext(os.path.basename(map_path))[0])
 
+    used_banks = [(b, notes) for b, notes in layout.get("pad_banks", {}).items()
+                  if any(lookup(note_map, n) for n in notes)]
+    # two full pad banks fit down the left; any more go compact in the right column
     pads_html = "".join(
         f'<div><h2>Pad bank {b} <em>press PAD BANK {b}</em></h2>{pad_grid(notes, note_map, presets, b)}</div>'
-        for b, notes in layout.get("pad_banks", {}).items()
-        if any(lookup(note_map, n) for n in notes))
+        for b, notes in used_banks[:2])
+    extra_pads_html = "".join(
+        f'<div><h2>Pad bank {b} <em>press PAD BANK {b}</em></h2>{pad_grid(notes, note_map, presets, b, compact=True)}</div>'
+        for b, notes in used_banks[2:])
     banks_html = "".join(
         f'<div><h2>Control bank {b} <em>{"default bank" if b == "A" else f"press CONTROL BANK until {b} is lit"}</em></h2>'
         f'{control_bank(b, nums, cc_map, presets)}</div>'
@@ -191,7 +200,7 @@ def build(map_path):
     <div class="padbanks">{pads_html}
       <div><h2>Transport</h2><div class="transport">{transport}</div></div>
     </div>
-    <div class="banks">{banks_html}
+    <div class="banks">{banks_html}{extra_pads_html}
       <div class="legend">
         <span><span class="sw" style="background:#111"></span>show-critical</span>
         <span><span class="sw" style="background:#fff7df"></span>action</span>
@@ -211,7 +220,8 @@ def build(map_path):
         <li>Power the MPD32 and load preset <b>18 ArkaosVJ</b> before starting GoonViz.</li>
         <li>Pads latch in that preset: every hit counts, so ignore the pad lights.</li>
         <li>Bring MASTER (F8) up. Keep a finger near <b>BLACKOUT</b> (S7) or ■ STOP.</li>
-        <li><b>Autopilot</b> (S1 / ▶ PLAY) changes preset every 32 beats if you need your hands free.</li>
+        <li><b>Autopilot</b> (S1 / ▶ PLAY) switches presets and keeps every knob moving. Bank B F7 sets intensity, from calm to wild.
+            Any knob you touch, autopilot leaves alone until the next switch.</li>
         <li>Save looks: S8 SHIFT on, hit a blue snapshot pad, SHIFT off.</li>
       </ol></div>
       <div class="box"><h2>If something's off</h2><ul>

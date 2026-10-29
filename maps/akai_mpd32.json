@@ -214,7 +214,7 @@
     "36": "d",
     "37": "cam_view",
     "38": "cam_spin",
-    "39": "saturation",
+    "39": "ap_intensity",
     "40": "react"
   },
   "note": {
@@ -249,7 +249,17 @@
     "64": "snapshot:4",
     "65": "snapshot:5",
     "66": "snapshot:6",
-    "67": "snapshot:7"
+    "67": "snapshot:7",
+    "68": "preset:17",
+    "69": "preset:18",
+    "70": "preset:19",
+    "71": "preset:20",
+    "72": "preset:21",
+    "73": "preset:22",
+    "74": "preset:23",
+    "75": "preset:24",
+    "76": "preset:25",
+    "77": "preset:26"
   },
   "mmc": {
     "rewind": "prev",

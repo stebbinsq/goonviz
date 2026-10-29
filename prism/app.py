@@ -21,7 +21,7 @@ DEFAULT_CONFIG = {
     "audio": {"device": None, "samplerate": 48000, "gain": 1.0, "fake": False, "noise_floor": 0.004},
     "video": {"source": None, "width": 640, "height": 360, "capture_size": None},
     "midi": {"port": None, "map": "maps/akai_mpd32.json", "clock_beats": True, "pickup": False},
-    "autopilot": {"enabled": False, "beats": 32, "seconds": 30, "randomize": True},
+    "autopilot": {"enabled": False, "intensity": 0.5},
     "snapshots": "snapshots.json",
 }
 
@@ -58,6 +58,9 @@ class App:
         from .video import VideoInput
         from .midi import MidiInput, MidiMap
         from .hud import Hud
+        from .autopilot import Autopilot
+        from .params import KALEIDO_CHAOS
+        from .palettes import PALETTES
 
         self.pg = pygame
         self.cfg = cfg
@@ -113,8 +116,9 @@ class App:
             with open(self.snap_path) as f:
                 self.snapshots = json.load(f)
 
-        ap = cfg["autopilot"]
-        self.autopilot = ap["enabled"]
+        self.pilot = Autopilot(self.params, KALEIDO_CHAOS, len(PALETTES))
+        self.pilot.enabled = cfg["autopilot"]["enabled"]
+        self.params["ap_intensity"].set_value(cfg["autopilot"].get("intensity", 0.5), immediate=True)
         self.items = [p.name for p in self.params.list] + ACTION_ITEMS
         self.selected = 0
         self.learning = False
@@ -128,8 +132,6 @@ class App:
                       "cam_yaw": 0.0}
         self.fps = 0.0
         self.last_reload_check = 0.0
-        self.ap_beats = 0
-        self.ap_since = 0.0
         self.last_beat_count = 0
 
         self.preset_index = 0
@@ -154,7 +156,8 @@ class App:
         self.preset_index = self.presets.index(preset)
         self.params.load_preset(preset.params)
         self.picked.clear()
-        self.ap_beats, self.ap_since = 0, 0.0
+        if hasattr(self, "pilot"):
+            self.pilot.start_preset()
         self.notify(preset.name)
 
     @property
@@ -207,8 +210,11 @@ class App:
             self.params.load_preset(self.preset.params)
             self.picked.clear()
         elif action == "autopilot":
-            self.autopilot = not self.autopilot
-            self.notify(f"autopilot {'on' if self.autopilot else 'off'}")
+            self.pilot.enabled = not self.pilot.enabled
+            if self.pilot.enabled:
+                self.pilot.home_hue = None
+                self.pilot.start_preset()
+            self.notify(f"autopilot {'on' if self.pilot.enabled else 'off'}")
         elif action == "blackout":
             self.blackout_target = 1.0 - self.blackout_target
         elif action == "freeze":
@@ -232,7 +238,7 @@ class App:
         elif action == "freeze":
             self.frozen = on
         elif action == "autopilot":
-            if self.autopilot != on:
+            if self.pilot.enabled != on:
                 self.do_action("autopilot")
         elif action == "video" and self.video:
             self.video.active = on
@@ -250,6 +256,7 @@ class App:
                     return
                 self.picked.add(target)
             p.set_norm(value)
+            self.pilot.touch(target)
             return
         latching = source in ("cc", "toggle_pad")
         if target in STATE_ACTIONS and latching:
@@ -315,8 +322,10 @@ class App:
             self.show_hud = True
         elif k in (pg.K_EQUALS, pg.K_RIGHTBRACKET, pg.K_KP_PLUS) and item in self.params:
             self.params[item].nudge(step)
+            self.pilot.touch(item)
         elif k in (pg.K_MINUS, pg.K_LEFTBRACKET, pg.K_KP_MINUS) and item in self.params:
             self.params[item].nudge(-step)
+            self.pilot.touch(item)
         elif k == pg.K_RETURN and item not in self.params:
             self.do_action(item)
         elif k == pg.K_l:
@@ -344,15 +353,12 @@ class App:
     def tick_autopilot(self, dt):
         beats = self.audio.beat_count - self.last_beat_count
         self.last_beat_count = self.audio.beat_count
-        if not self.autopilot:
-            return
-        ap = self.cfg["autopilot"]
-        self.ap_beats += beats
-        self.ap_since += dt
-        if self.ap_beats >= ap["beats"] or self.ap_since >= ap["seconds"]:
-            self.do_action("random_preset")
-            if ap["randomize"]:
-                self.params.randomize()
+        for event in self.pilot.update(dt, beats):
+            if event == "switch":
+                self.do_action("random_preset")
+                self.pilot.on_switched()
+            elif event == "flash":
+                self.state["flash"] = 0.7
 
     def hud_lines(self):
         white, dim, hot, warn = (235, 235, 235), (140, 140, 160), (255, 200, 90), (255, 110, 110)
@@ -365,7 +371,7 @@ class App:
             (f"video {self.video.status if self.video else 'none'}   midi {', '.join(self.midi.ports) or 'no device'}", dim),
             (f"last midi: {self.midi.last_message}", dim),
         ]
-        flags = [f for f, on in (("AUTOPILOT", self.autopilot), ("FROZEN", self.frozen),
+        flags = [f for f, on in ((f"AUTOPILOT {self.pilot.intensity:.0%}", self.pilot.enabled), ("FROZEN", self.frozen),
                                  ("BLACKOUT", self.blackout_target > 0), ("SHIFT", self.shift)) if on]
         if flags:
             lines.append(("  ".join(flags), hot))

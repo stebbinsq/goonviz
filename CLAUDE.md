@@ -14,6 +14,12 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
+- 27 presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
+  "Jade Cicada"-style organic visuals). 10 palettes.
+- Autopilot lives in prism/autopilot.py and web/js/autopilot.js (ports of each other); intensity is the
+  `ap_intensity` param. Auto-exposure (Engine._meter / Engine.meter) reads the composited frame's 1x1 mip.
+- tools/build_web.py stamps `?v=<hash>` onto script tags so browsers never mix stale and fresh files.
+
 - All 17 presets compile as GLSL ES 3.00 in Chrome; MPD32 logic verified with simulated MIDI in the browser.
   Not yet tried with a real MPD32 or webcam in Chrome, or on the Intel MacBook.
 - The camera channel order differs per platform: shaders use the `VIDEO_SWIZZLE` macro (bgr in Python, rgb on the web).

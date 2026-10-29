@@ -9,8 +9,10 @@ presets, shaders, palettes, params or maps:
 """
 
 import glob
+import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 
@@ -53,9 +55,24 @@ def main():
         json.dump(data, f, separators=(",", ":"))
         f.write(";\n")
     print(f"wrote {out}: {len(presets)} presets, {len(maps)} maps")
+    stamp_scripts()
     sheet = os.path.join(ROOT, "docs", "akai_mpd32_cheatsheet.pdf")
     if os.path.exists(sheet):
         shutil.copy(sheet, os.path.join(ROOT, "web", "cheatsheet.pdf"))
+
+
+def stamp_scripts():
+    """Add ?v=<hash> to every script in index.html so browsers never mix old and new files after a deploy
+    (GitHub Pages lets browsers cache for 10 minutes)."""
+    web = os.path.join(ROOT, "web")
+    files = [os.path.join(web, "bundle.js")] + sorted(glob.glob(os.path.join(web, "js", "*.js")))
+    digest = hashlib.sha1(b"".join(open(f, "rb").read() for f in files)).hexdigest()[:10]
+    index = os.path.join(web, "index.html")
+    with open(index) as f:
+        page = f.read()
+    page = re.sub(r'src="((?:bundle|js/[\w-]+)\.js)(?:\?v=\w+)?"', rf'src="\1?v={digest}"', page)
+    with open(index, "w") as f:
+        f.write(page)
 
 
 if __name__ == "__main__":

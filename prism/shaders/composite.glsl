@@ -9,6 +9,7 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform float uFeedback, uFbZoom, uFbRot, uFbHue;
 uniform float uKaleido, uWarp, uChroma, uGlow;
+uniform float uExposure;  // auto-exposure: < 1 when the scene is too bright (set by the engine)
 uniform float uVideoMix, uVideoOn, uVideo360, uCamView, uCamYaw;
 uniform float uBeat, uBass;
 
@@ -45,6 +46,8 @@ void main() {
         sc += bloom * bloom * uGlow * (1.6 + uBass);
         sc = softclip(sc);
     }
+
+    sc *= uExposure;
 
     // Feedback: sample last frame slightly zoomed/rotated, hue-drift it, decay it.
     vec2 f = (vUV - 0.5) * vec2(asp, 1.0);
