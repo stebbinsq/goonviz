@@ -20,6 +20,12 @@ Needs **Google Chrome** (or Edge); Safari can't talk to MIDI controllers.
 4. Connect the projector as a **separate display** (not mirrored), then click **⛶ Projector** (or press **F**). Chrome asks once
    for permission to use your displays, then sends the visuals fullscreen to the projector. **Esc** comes back.
 
+**On a phone or tablet** it works too (open goonviz.live): swipe the visuals left/right to change preset and
+double-tap for fullscreen (on iPhone, which can't fullscreen a page, it fills the screen instead). Phones get a
+lighter profile automatically (lower internal resolution, and a steady 30 fps on the heaviest presets if 60 isn't
+possible) while desktops keep full quality. MIDI controllers work in Chrome on Android, but not on iPhone/iPad
+(no browser there supports MIDI).
+
 Before a show:
 - Plug the MacBook into power. A MacBook Air has no fan, so expect it to get warm; if the frame rate drops, set
   **Quality** to Medium.

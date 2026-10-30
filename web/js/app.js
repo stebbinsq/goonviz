@@ -27,8 +27,15 @@
   };
   const STATE_ACTIONS = new Set(D.stateActions);
 
+  // Phones and tablets get a lighter profile; desktops are untouched. iPadOS reports itself as a Mac, so
+  // a Mac with a touchscreen counts as a tablet.
+  const MOBILE = !!(navigator.userAgentData?.mobile) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                 (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
   class App {
     constructor() {
+      this.mobile = MOBILE;
+      document.body.classList.toggle("mobile", MOBILE);
       this.canvas = $("#view");
       this.engine = new Prism.Engine(this.canvas, D);
       this.presets = this.engine.presets;
@@ -66,6 +73,8 @@
       if (!window.isSecureContext) this.insecureWarning();
       this.selectPreset(0);
       this.bindKeys();
+      this.bindTouch();
+      document.addEventListener("visibilitychange", () => { if (this.started) this.keepAwake(); });
       new ResizeObserver(() => this.resize()).observe(this.canvas);
       document.addEventListener("fullscreenchange", () => { this.resize(); this.refreshChrome(); });
       this.resize();
@@ -112,7 +121,7 @@
       const before = this.presetIndex;
       for (let step = 0; step < n; step++) {
         const i = (((index + step) % n) + n) % n;
-        if (this.presets[i].program) { this.presetIndex = i; break; }
+        if (this.engine.ensure(this.presets[i])) { this.presetIndex = i; break; }
       }
       if (before !== undefined && before !== this.presetIndex) {
         this.st.transition = 1; // melt old into new
@@ -223,6 +232,7 @@
         if (e.key === " ") { e.preventDefault(); if (!e.repeat) this.doAction("flash", true); return; }
         if (e.repeat) return;
         if (e.key === "Escape" && this.learning) { this.learning = null; this.refreshLearn(); return; }
+        if (e.key === "Escape" && document.body.classList.contains("immersive")) { this.setImmersive(false); return; }
         if (e.key === "f") { this.toggleFullscreen(); return; }
         if (/^[0-9]$/.test(e.key)) { this.selectPreset((parseInt(e.key, 10) + 9) % 10); return; }
         const action = keymap[e.key] || keymap[e.key.toLowerCase()];
@@ -247,6 +257,8 @@
       await this.listDevices();
       $("#start").hidden = true;
       $("body").classList.add("started");
+      this.started = true;
+      this.keepAwake();
       this.refreshChrome();
     }
 
@@ -300,8 +312,15 @@
     // ---- fullscreen / projector --------------------------------------------
 
     async toggleFullscreen() {
-      if (document.fullscreenElement) return document.exitFullscreen();
+      if (document.body.classList.contains("immersive")) return this.setImmersive(false);
+      if (document.fullscreenElement || document.webkitFullscreenElement)
+        return (document.exitFullscreen || document.webkitExitFullscreen).call(document);
       const stage = $("#stage");
+      if (!stage.requestFullscreen) {
+        // iPhone Safari can't fullscreen a page element: fill the screen ourselves instead
+        if (stage.webkitRequestFullscreen) return stage.webkitRequestFullscreen();
+        return this.setImmersive(true);
+      }
       let screen;
       if ("getScreenDetails" in window) {
         try {
@@ -315,14 +334,50 @@
       catch (e) { await stage.requestFullscreen(); }
     }
 
+    setImmersive(on) {
+      document.body.classList.toggle("immersive", on);
+      this.resize();
+      if (on) this.notify("double-tap or Esc to exit");
+    }
+
+    // Swipe left/right on the visuals for next/previous preset; double-tap for fullscreen.
+    bindTouch() {
+      const stage = $("#stage");
+      let sx = 0, sy = 0, st = 0, lastTap = 0;
+      stage.addEventListener("touchstart", (e) => {
+        if (e.touches.length !== 1) return;
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = performance.now();
+      }, { passive: true });
+      stage.addEventListener("touchend", (e) => {
+        if (e.target.closest("button")) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - sx, dy = t.clientY - sy, quick = performance.now() - st < 600;
+        if (quick && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+          this.doAction(dx < 0 ? "next" : "prev");
+          lastTap = 0;
+        } else if (Math.abs(dx) < 14 && Math.abs(dy) < 14) {
+          const now = performance.now();
+          if (now - lastTap < 320) { e.preventDefault(); this.toggleFullscreen(); lastTap = 0; } else lastTap = now;
+        }
+      });
+    }
+
+    // Ask the device not to dim or sleep the screen while GoonViz runs (re-asked when the tab returns).
+    async keepAwake() {
+      try {
+        if ("wakeLock" in navigator && document.visibilityState === "visible") this.wakeLock = await navigator.wakeLock.request("screen");
+      } catch (e) { /* not supported or refused: harmless */ }
+    }
+
     resize() {
-      const dpr = window.devicePixelRatio || 1;
+      // phones have 3x screens; 2x is plenty for the display pass and saves a lot of fill rate
+      const dpr = Math.min(window.devicePixelRatio || 1, this.mobile ? 2 : Infinity);
       const w = Math.max(16, Math.round(this.canvas.clientWidth * dpr));
       const h = Math.max(16, Math.round(this.canvas.clientHeight * dpr));
       if (this.canvas.width !== w || this.canvas.height !== h) { this.canvas.width = w; this.canvas.height = h; }
       const q = this.settings.quality;
       const targetWidth = q === "low" ? 800 : q === "medium" ? 1200 : q === "high" ? 1920
-                        : this.engine.weakGpu ? 960 : 1440; // auto: Intel graphics get a lighter load
+                        : this.mobile ? 720 : this.engine.weakGpu ? 960 : 1440; // auto: phones and Intel graphics get a lighter load
       this.engine.resize(w, h, Math.min(1, targetWidth / w) * this.dyn);
     }
 
@@ -340,9 +395,13 @@
       const p20 = sorted[Math.floor(sorted.length * 0.2)] || 16.7;
       this.refreshMs = [144, 120, 100, 90, 75, 60, 50, 30].map((hz) => 1000 / hz)
         .reduce((best, x) => (Math.abs(x - p20) < Math.abs(best - p20) ? x : best));
-      const target = this.refreshMs;
-      if (this.frameMs > target * 1.18 && this.dyn > 0.5) {
-        this.dyn = Math.max(0.5, this.dyn * 0.88);
+      // Phones: if even the lowest resolution can't hold the display rate, settle for a steady half rate
+      // (30 fps on a 60 Hz phone) and spend the extra time on sharpness instead of mush. Desktops never do this.
+      const floor = this.mobile ? 0.45 : 0.5;
+      if (this.mobile && !this.halfRate && this.dyn <= floor && this.frameMs > this.refreshMs * 1.18) this.halfRate = true;
+      const target = this.refreshMs * (this.halfRate ? 2 : 1);
+      if (this.frameMs > target * 1.18 && this.dyn > floor) {
+        this.dyn = Math.max(floor, this.dyn * 0.88);
         this.dynCheck = now + 1000;
         this.resize();
       } else if (this.frameMs < target * 1.04 && this.dyn < 1) {
@@ -361,6 +420,7 @@
       if (dt > 0 && this.settings.quality === "auto") this.adaptResolution(dt, now);
       const P = this.params, st = this.st;
 
+      this.engine.pump();
       this.audio.update(dt);
       P.update(dt);
       this.tickAutopilot(dt);
@@ -437,7 +497,7 @@
         b.innerHTML = `<span class="n">${i + 1}</span><span class="name"></span>`;
         b.querySelector(".name").textContent = p.name.replace(" (video)", "");
         if (/\(video\)/.test(p.name)) b.classList.add("video");
-        if (!p.program) { b.disabled = true; b.title = p.error; }
+        if (p.error) { b.disabled = true; b.title = p.error; }
         b.onclick = () => this.selectPreset(i);
         b.appendChild(this.learnButton(`preset:${i}`));
         grid.appendChild(b);
@@ -578,6 +638,7 @@
       $("#pilotBtn").firstChild.textContent = this.pilot.enabled ? "Autopilot ON" : "Autopilot off";
     }
     refreshLive() {
+      this.presetButtons.forEach((b, i) => { if (this.presets[i].error && !b.disabled) { b.disabled = true; b.title = this.presets[i].error; } });
       for (const p of this.params.list) {
         const s = this.sliders[p.name];
         if (document.activeElement !== s.input) s.input.value = p.target;
@@ -589,7 +650,7 @@
       const bar = (x) => `<i style="width:${Math.round(Math.min(1, x) * 100)}%"></i>`;
       $("#meters").innerHTML = `<span>bass</span><b>${bar(a.bass)}</b><span>mid</span><b>${bar(a.mid)}</b><span>high</span><b>${bar(a.high)}</b>` +
         `<span class="beat ${a.beat > 0.5 ? "hit" : ""}">●</span>`;
-      $("#fps").textContent = `${Math.round(this.fps)}/${Math.round(1000 / this.refreshMs)} fps · ${this.engine.internal[0]}×${this.engine.internal[1]}`;
+      $("#fps").textContent = `${Math.round(this.fps)}/${Math.round(1000 / this.refreshMs / (this.halfRate ? 2 : 1))} fps · ${this.engine.internal[0]}×${this.engine.internal[1]}`;
       $("#midiStatus").textContent = this.midi.status;
       $("#midiLast").textContent = this.midi.last;
       $("#audioStatus").textContent = a.fake ? "demo beat" : a.status === "live" ? a.label : a.status;
