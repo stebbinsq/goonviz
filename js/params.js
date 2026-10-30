@@ -54,7 +54,7 @@
       this.byName.kaleido.setValue(this.kaleidoChaos[Math.floor(Math.random() * this.kaleidoChaos.length)]);
       this.byName.palette.setValue(Math.floor(Math.random() * this.paletteCount));
     }
-    snapshot() { return Object.fromEntries(this.list.map((p) => [p.name, +p.targetValue.toFixed(4)])); }
+    snapshot() { return Object.fromEntries(this.list.filter((p) => p.scope !== "input").map((p) => [p.name, +p.targetValue.toFixed(4)])); }
     restore(values) { for (const [k, v] of Object.entries(values)) if (this.byName[k]) this.byName[k].setValue(v); }
   }
 
