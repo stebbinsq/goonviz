@@ -51,6 +51,8 @@ void main() {
       params: meta.params || {},
       labels: meta.labels || {},
       heavy: !!meta.heavy,   // raymarched 3D/4D: too much for a Raspberry Pi
+      energy: meta.energy || 2,          // 1 calm .. 3 intense (autopilot matches it to the music)
+      family: meta.family || "organic",  // kind of picture (autopilot varies it and picks routines by it)
       stepped: steppedKnobs(source),
       program: null, error: null,
     };
