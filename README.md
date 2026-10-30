@@ -46,6 +46,12 @@ Mandelbulb Bloom, Chrome Lattice. 4D (four-dimensional shapes sliced into 3D as 
 dimension): Quaternion Julia, Tesseract Lattice, Hyper Crystal, Hypergyroid. They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
+**On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light
+profile: a lower starting resolution, a steady 30 fps fallback, and the heavy 3D/4D presets (marked "3D" on the
+Pi) are left out of random picks and autopilot so a hands-off show never lands on one that crawls. You can still
+pick them by hand. To try the Pi profile on another machine, open `goonviz.live/?profile=pi`
+(`?profile=mobile` and `?profile=desktop` work too). Presets opt in to this with `"heavy": true` in their header.
+
 Retired presets live in `presets/archive/` (not loaded). To bring one back, move it into `presets/`, give it a
 free number, and run `python3 tools/build_web.py`.
 

@@ -4,6 +4,7 @@ import argparse
 import json
 import math
 import os
+import platform
 import random
 import sys
 import time
@@ -66,6 +67,7 @@ class App:
 
         self.pg = pygame
         self.cfg = cfg
+        self.low_power = platform.machine().lower() in ("aarch64", "arm64", "armv7l") and sys.platform.startswith("linux")
         if sys.platform.startswith("linux") and not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
             os.environ.setdefault("SDL_VIDEODRIVER", "kmsdrm")  # Pi OS Lite: straight to the HDMI output
         pygame.init()
@@ -205,7 +207,9 @@ class App:
         elif action == "prev":
             self.select_preset((self.preset_index - 1) % n)
         elif action == "random_preset":
-            choices = [i for i in range(n) if i != self.preset_index] or [0]
+            # on a Pi (any ARM board), random picks and so autopilot avoid the heavy 3D/4D presets
+            choices = [i for i in range(n) if i != self.preset_index
+                       and not (self.low_power and self.presets[i].heavy)] or [self.preset_index]
             self.select_preset(random.choice(choices))
         elif action == "randomize":
             self.params.randomize()

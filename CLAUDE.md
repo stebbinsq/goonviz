@@ -28,6 +28,10 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 - Mobile (web/js/app.js MOBILE): lower Auto target (720 px), DPR capped at 2, resolution floor 0.45, half-rate
   fallback (halfRate) when even the floor can't hold the refresh rate; swipe / double-tap; immersive mode for
   iPhone (no element fullscreen); screen wake lock. Desktop code paths are unchanged.
+- Pi profile (web App.pi / native App.low_power): detected via the Broadcom/V3D renderer or ARM Linux;
+  768 px Auto target, same floor/half-rate as phones, and random_preset/autopilot skip presets whose header has
+  "heavy": true (the 9 raymarched 3D/4D ones). ?profile=pi|mobile|desktop forces a profile for testing.
+  Not yet tried on real Pi hardware.
 - Shaders compile in the background (KHR_parallel_shader_compile; Engine.pump/ensure): first preset is ready
   immediately, the rest within a few seconds.
 - Autopilot lives in prism/autopilot.py and web/js/autopilot.js (ports of each other); intensity is the

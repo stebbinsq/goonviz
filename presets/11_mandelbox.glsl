@@ -1,4 +1,4 @@
-// @preset {"name": "Mandelbox", "labels": {"a": "fold scale", "b": "camera distance", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 3, "glow": 0.5, "feedback": 0.2, "chroma": 0.15, "a": 0.4, "c": 0.5}}
+// @preset {"heavy": true, "name": "Mandelbox", "labels": {"a": "fold scale", "b": "camera distance", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 3, "glow": 0.5, "feedback": 0.2, "chroma": 0.15, "a": 0.4, "c": 0.5}}
 // The Mandelbox: box fold, sphere fold, scale, repeat. It grows a whole alien architecture of towers,
 // chambers and lattices. Orbit-trap colour, ambient occlusion and a slow camera drift around it.
 // Heavy: best on a Mac.

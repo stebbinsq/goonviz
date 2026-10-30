@@ -1,4 +1,4 @@
-// @preset {"name": "Apollonian Foam", "labels": {"a": "bubble size", "b": "drift", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.2, "chroma": 0.15}}
+// @preset {"heavy": true, "name": "Apollonian Foam", "labels": {"a": "bubble size", "b": "drift", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.2, "chroma": 0.15}}
 // Drifting through a 3D Apollonian gasket: spheres packed inside spheres forever, a foam of bubbles at
 // every scale, coloured by orbit traps and lit with soft occlusion. Heavy: best on a Mac.
 

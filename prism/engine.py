@@ -91,6 +91,7 @@ class Preset:
         self.name = meta.get("name", self.key.replace("_", " ").title())
         self.params = meta.get("params", {})
         self.labels = meta.get("labels", {})
+        self.heavy = bool(meta.get("heavy", False))   # raymarched 3D/4D: too much for a Raspberry Pi
         self.stepped = stepped_knobs(self.source)
 
     def changed_on_disk(self):

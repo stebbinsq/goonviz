@@ -1,4 +1,4 @@
-// @preset {"name": "Hypergyroid", "labels": {"a": "cave scale", "b": "4D spin", "c": "wall thickness", "d": "color"}, "params": {"palette": 6, "glow": 0.55, "feedback": 0.25, "chroma": 0.2, "c": 0.4}}
+// @preset {"heavy": true, "name": "Hypergyroid", "labels": {"a": "cave scale", "b": "4D spin", "c": "wall thickness", "d": "color"}, "params": {"palette": 6, "glow": 0.55, "feedback": 0.25, "chroma": 0.2, "c": 0.4}}
 // Flying through caves in a four-dimensional gyroid, sliced into 3D. As it turns through the 4th
 // dimension the walls flow, open and seal around you. Iridescent thin-film walls. Heavy: best on a Mac.
 

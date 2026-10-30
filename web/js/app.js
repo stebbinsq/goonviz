@@ -29,7 +29,10 @@
 
   // Phones and tablets get a lighter profile; desktops are untouched. iPadOS reports itself as a Mac, so
   // a Mac with a touchscreen counts as a tablet.
-  const MOBILE = !!(navigator.userAgentData?.mobile) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  // ?profile=pi|mobile|desktop in the address forces a profile (handy for testing on another machine).
+  const FORCED = new URLSearchParams(location.search).get("profile");
+  const MOBILE = FORCED ? FORCED === "mobile" :
+                 !!(navigator.userAgentData?.mobile) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
                  (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
   class App {
@@ -38,6 +41,14 @@
       document.body.classList.toggle("mobile", MOBILE);
       this.canvas = $("#view");
       this.engine = new Prism.Engine(this.canvas, D);
+      // Raspberry Pi (and similar small ARM boards): recognised by the Pi's Broadcom/V3D graphics chip, or by
+      // being an ARM Linux machine that isn't a phone. Gets a light profile and skips heavy presets when
+      // choosing at random (autopilot). Desktops and phones are unaffected.
+      this.pi = FORCED ? FORCED === "pi" :
+                /v3d|videocore|broadcom/i.test(this.engine.renderer) ||
+                (/Linux (aarch64|armv)/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent));
+      this.lowPower = this.mobile || this.pi;
+      document.body.classList.toggle("pi", this.pi);
       this.presets = this.engine.presets;
       this.params = new Prism.ParamSet(D.params, D.kaleidoChaos, D.palettes.length);
       this.audio = new Prism.Audio();
@@ -145,9 +156,9 @@
       if (action === "next") this.selectPreset(this.presetIndex + 1);
       else if (action === "prev") this.selectPreset(this.presetIndex - 1);
       else if (action === "random_preset") {
-        let i = this.presetIndex;
-        while (n > 1 && i === this.presetIndex) i = Math.floor(Math.random() * n);
-        this.selectPreset(i);
+        // on a Pi, random picks (and so autopilot) avoid the heavy 3D/4D presets; you can still pick them by hand
+        const pool = this.presets.map((p, i) => i).filter((i) => i !== this.presetIndex && !(this.pi && this.presets[i].heavy));
+        this.selectPreset(pool.length ? pool[Math.floor(Math.random() * pool.length)] : this.presetIndex);
       } else if (action === "randomize") { this.params.randomize(); this.picked.clear(); }
       else if (action === "reset") { this.params.loadPreset(this.preset.params); this.picked.clear(); }
       else if (action === "autopilot") {
@@ -371,13 +382,13 @@
 
     resize() {
       // phones have 3x screens; 2x is plenty for the display pass and saves a lot of fill rate
-      const dpr = Math.min(window.devicePixelRatio || 1, this.mobile ? 2 : Infinity);
+      const dpr = Math.min(window.devicePixelRatio || 1, this.lowPower ? 2 : Infinity);
       const w = Math.max(16, Math.round(this.canvas.clientWidth * dpr));
       const h = Math.max(16, Math.round(this.canvas.clientHeight * dpr));
       if (this.canvas.width !== w || this.canvas.height !== h) { this.canvas.width = w; this.canvas.height = h; }
       const q = this.settings.quality;
       const targetWidth = q === "low" ? 800 : q === "medium" ? 1200 : q === "high" ? 1920
-                        : this.mobile ? 720 : this.engine.weakGpu ? 960 : 1440; // auto: phones and Intel graphics get a lighter load
+                        : this.mobile ? 720 : this.pi ? 768 : this.engine.weakGpu ? 960 : 1440; // auto: phones, Pis and Intel graphics get a lighter load
       this.engine.resize(w, h, Math.min(1, targetWidth / w) * this.dyn);
     }
 
@@ -397,8 +408,8 @@
         .reduce((best, x) => (Math.abs(x - p20) < Math.abs(best - p20) ? x : best));
       // Phones: if even the lowest resolution can't hold the display rate, settle for a steady half rate
       // (30 fps on a 60 Hz phone) and spend the extra time on sharpness instead of mush. Desktops never do this.
-      const floor = this.mobile ? 0.45 : 0.5;
-      if (this.mobile && !this.halfRate && this.dyn <= floor && this.frameMs > this.refreshMs * 1.18) this.halfRate = true;
+      const floor = this.lowPower ? 0.45 : 0.5;
+      if (this.lowPower && !this.halfRate && this.dyn <= floor && this.frameMs > this.refreshMs * 1.18) this.halfRate = true;
       const target = this.refreshMs * (this.halfRate ? 2 : 1);
       if (this.frameMs > target * 1.18 && this.dyn > floor) {
         this.dyn = Math.max(floor, this.dyn * 0.88);
@@ -497,6 +508,7 @@
         b.innerHTML = `<span class="n">${i + 1}</span><span class="name"></span>`;
         b.querySelector(".name").textContent = p.name.replace(" (video)", "");
         if (/\(video\)/.test(p.name)) b.classList.add("video");
+        if (p.heavy) { b.classList.add("heavy"); b.title = "3D/4D: heavy. Fine on a Mac or modern phone, slow on a Raspberry Pi"; }
         if (p.error) { b.disabled = true; b.title = p.error; }
         b.onclick = () => this.selectPreset(i);
         b.appendChild(this.learnButton(`preset:${i}`));
