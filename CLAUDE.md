@@ -44,6 +44,8 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   `ap_intensity` param. It's a director: energy EMAs detect drops/breakdowns, changes land on
   phrase boundaries, presets are scored by the `energy` (1-3) and `family` fields in each `// @preset` header
   (new presets need both), and each phrase runs a routine picked by family. The app passes a can-use check. Auto-exposure (Engine._meter / Engine.meter) reads the composited frame's 1x1 mip.
+- Mic sensitivity is the `audio_sens` param (scope "input": survives presets, left out of snapshots), bank B F8.
+  Audio.sensitivity scales pre-floor gain x0.25..x4 and the beat thresholds; 0.5 = the original behaviour.
 - tools/build_web.py stamps `?v=<hash>` onto script tags so browsers never mix stale and fresh files.
 
 - All 17 presets compile as GLSL ES 3.00 in Chrome; MPD32 logic verified with simulated MIDI in the browser.

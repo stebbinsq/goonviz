@@ -94,6 +94,8 @@
   .action.on { border-color: var(--gold); color: var(--gold); }
   .pilot { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center; }
   .pilot .knob { grid-template-columns: 62px 1fr 40px 22px; margin: 0; }
+  .sens .knob { grid-template-columns: 74px 1fr 40px 22px; margin: 8px 0 0; }
+  .sens .knob .lbl { color: var(--dim); }
   #pilotBtn.on { background: #2a2208; }
   .snap.filled { border-color: var(--accent2); }
   .learn { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; padding: 0; border-radius: 4px;
@@ -166,6 +168,7 @@
     <div class="field"><span>Audio</span><select id="micSel"><option>click Start first</option></select></div>
     <div class="status" id="audioStatus"></div>
     <div id="meters"></div>
+    <div class="sens" id="sensKnob" title="How easily the mic hears the music: raise it for a quiet room or a laptop far from the speakers, lower it in a loud club. Audio react (Knobs) sets how hard the visuals respond."></div>
     <div class="field" style="margin-top:8px"><span>MIDI</span><div class="chip" id="midiStatus">not started</div></div>
     <div class="status" id="midiLast"></div>
     <div class="field" id="cam360row" hidden><span>360 cam</span><div class="hint">360 view & spin knobs are below</div></div>
@@ -224,12 +227,12 @@
 </div>
 
 <video id="cam" playsinline muted hidden></video>
-<script src="bundle.js?v=d6be3af110"></script>
-<script src="js/params.js?v=d6be3af110"></script>
-<script src="js/audio.js?v=d6be3af110"></script>
-<script src="js/midi.js?v=d6be3af110"></script>
-<script src="js/autopilot.js?v=d6be3af110"></script>
-<script src="js/engine.js?v=d6be3af110"></script>
-<script src="js/app.js?v=d6be3af110"></script>
+<script src="bundle.js?v=2e7f62c4f0"></script>
+<script src="js/params.js?v=2e7f62c4f0"></script>
+<script src="js/audio.js?v=2e7f62c4f0"></script>
+<script src="js/midi.js?v=2e7f62c4f0"></script>
+<script src="js/autopilot.js?v=2e7f62c4f0"></script>
+<script src="js/engine.js?v=2e7f62c4f0"></script>
+<script src="js/app.js?v=2e7f62c4f0"></script>
 </body>
 </html>

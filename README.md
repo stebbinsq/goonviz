@@ -14,9 +14,10 @@ Needs **Google Chrome** (or Edge); Safari can't talk to MIDI controllers.
 
 1. Open **https://goonviz.live** in Chrome, or, with no internet, double-click **Open GoonViz.command** in this folder.
    The first time, macOS may say it's from an unidentified developer: right-click it → Open.
-2. Plug in the MPD32 (load its preset **18 ArkaosVJ**), click **Start GoonViz**, and allow the camera, microphone and MIDI.
+2. Plug in the MPD32 (on its preset **1**, as it comes), click **Start GoonViz**, and allow the camera, microphone and MIDI.
 3. Pick the camera and audio input in the panel on the right. A USB audio interface fed from the mixer locks to the beat
-   best. **Demo beat** works with no audio at all.
+   best. **Demo beat** works with no audio at all. If the meters barely move or beats are missed, raise
+   **Sensitivity** under the meters (or bank B fader F8); lower it in a loud room if everything twitches.
 4. Connect the projector as a **separate display** (not mirrored), then click **⛶ Projector** (or press **F**). Chrome asks once
    for permission to use your displays, then sends the visuals fullscreen to the projector. **Esc** comes back.
 
@@ -149,6 +150,7 @@ journalctl -u prism -f                    # logs
 | `audio.device` | Name fragment or index from `--list-audio`. Default `"Insta360"`; `null` = default input |
 | `audio.fallback_to_default` | If that device is missing, use the default input instead of staying silent |
 | `audio.gain` | Pre-gain. The analysis auto-levels, so this rarely needs touching |
+| `audio.sensitivity` | Starting mic sensitivity, 0 (loud club) … 1 (quiet room); also the `audio_sens` knob, default 0.5 |
 | `video.source` | `"insta360"` (default, auto-detected), `0` (other USB cam / capture dongle), `"picam"`, a video file path (loops), or `null` (off) |
 | `video.capture_size` | Resolution requested from the camera. 360 default `[1920, 960]`; `[2880, 1440]` is sharper but heavier on the Pi |
 | `midi.map` | Which mapping file to use. Default `maps/akai_mpd32.json`; also `generic.json`, `nanokontrol2.json`, or your own |
@@ -177,7 +179,7 @@ The main layout:
   - Faders: trails ×4, glow, kaleido, camera mix, MASTER.
   - Switches: autopilot, freeze, camera, strobe, invert, overlay, BLACKOUT, SHIFT.
 - **Control bank B:** warp, chroma, saturation, contrast, audio react…, the 360 view and spin (faders F5, F6), and
-  **autopilot intensity** (fader F7).
+  **autopilot intensity** (fader F7), **mic sensitivity** (fader F8).
 - **Transport:** ◀◀ / ▶▶ prev/next, ■ blackout, ▶ autopilot, ● randomize.
 
 If you switch the MPD32 to a different preset, the numbers change. Re-map with MIDI learn (the **L** buttons), or
@@ -251,6 +253,8 @@ that preset) plus shared FX and master controls:
 - **video_mix**: blend the camera over any preset
 - **cam_view, cam_spin**: 360-camera projection (flat / look-around / tiny planet / rabbit hole) and pan
 - **react**: how hard the audio drives everything; **strobe**: white flash on the beat
+- **audio_sens**: how easily the mic hears the music: input level and how small a kick still counts as a beat.
+  It belongs to the room, so presets and snapshots don't change it
 
 Actions (mappable to pads/buttons): `next` `prev` `random_preset` `randomize` `reset`
 `autopilot` `blackout` `flash` (held) `freeze` `shift` (held) `tap` `video` `hud`

@@ -7,7 +7,8 @@ import random
 #   curve:  "lin" or "exp" (exp for things like zoom where you want fine control near 1)
 #   int:    snap to whole numbers
 #   scope:  "preset" params reset to defaults when a preset loads,
-#           "master" params (colour, brightness, etc.) survive preset changes
+#           "master" params (colour, brightness, etc.) survive preset changes,
+#           "input" params (mic sensitivity) belong to the room: they survive preset changes and aren't in snapshots
 #   chaos:  (lo, hi) range used by the randomize action; omitted = never randomized
 PARAM_DEFS = [
     ("speed",      0.0, 4.0,  1.0,  dict(scope="preset", chaos=(0.4, 1.8))),
@@ -33,6 +34,7 @@ PARAM_DEFS = [
     ("cam_view",   0.0, 3.0,  2.0,  dict(scope="master", int=True)),   # 360 cams: flat/look/planet/hole
     ("cam_spin",  -1.0, 1.0,  0.15, dict(scope="master")),
     ("react",      0.0, 2.0,  1.0,  dict(scope="master")),
+    ("audio_sens", 0.0, 1.0,  0.5,  dict(scope="input")),    # mic sensitivity: quiet room 1, loud club 0
     ("strobe",     0.0, 1.0,  0.0,  dict(scope="master")),
     ("ap_intensity", 0.0, 1.0, 0.5, dict(scope="master")),   # autopilot: how often and how wild
     ("invert",     0.0, 1.0,  0.0,  dict(scope="master")),
@@ -128,7 +130,7 @@ class ParamSet:
         self.by_name["palette"].set_value(rng.randrange(int(self.by_name["palette"].hi) + 1))
 
     def snapshot(self):
-        return {p.name: round(p.target_value, 4) for p in self.list}
+        return {p.name: round(p.target_value, 4) for p in self.list if p.scope != "input"}
 
     def restore(self, values):
         for name, value in values.items():

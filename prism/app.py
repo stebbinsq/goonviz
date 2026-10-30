@@ -19,7 +19,8 @@ DEFAULT_CONFIG = {
     "render_scale": 0.5,
     "max_fps": 60,
     "start_preset": 0,
-    "audio": {"device": None, "samplerate": 48000, "gain": 1.0, "fake": False, "noise_floor": 0.015},
+    "audio": {"device": None, "samplerate": 48000, "gain": 1.0, "fake": False, "noise_floor": 0.015,
+              "sensitivity": 0.5},
     "video": {"source": None, "width": 640, "height": 360, "capture_size": None},
     "midi": {"port": None, "map": "maps/akai_mpd32.json", "clock_beats": True, "pickup": False},
     "autopilot": {"enabled": False, "intensity": 0.5},
@@ -124,6 +125,7 @@ class App:
         self.pilot.enabled = cfg["autopilot"]["enabled"]
         self.pilot.configure(self.presets, self._pilot_can_use)
         self.params["ap_intensity"].set_value(cfg["autopilot"].get("intensity", 0.5), immediate=True)
+        self.params["audio_sens"].set_value(cfg["audio"].get("sensitivity", 0.5), immediate=True)
         self.items = [p.name for p in self.params.list] + ACTION_ITEMS
         self.selected = 0
         self.learning = False
@@ -433,6 +435,7 @@ class App:
             for msg in self.midi.poll():
                 self.handle_midi(msg)
 
+            self.audio.sensitivity = self.params.v("audio_sens")
             self.audio.update(dt)
             self.params.update(dt)
             self.tick_autopilot(dt)

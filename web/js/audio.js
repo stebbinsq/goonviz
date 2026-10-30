@@ -17,6 +17,7 @@
       this.status = "off";
       this.fake = false;
       this.gain = 1;
+      this.sensitivity = 0.5; // the Sensitivity slider: 0 deaf (loud club) .. 1 hears a quiet room
       // Auto-gain never amplifies past this level: a quiet room through a laptop mic must not be
       // boosted until typing and talking look like bass hits.
       this.noiseFloor = 0.015;
@@ -94,7 +95,7 @@
       this.analyser.getFloatFrequencyData(this._freq); // dB
       this.analyser.getFloatTimeDomainData(this._time);
       const mags = this._freq;
-      const g = this.gain;
+      const g = this.gain * Math.pow(4, 2 * this.sensitivity - 1); // x0.25 .. x4 before the noise floor
       for (let i = 0; i < mags.length; i++) mags[i] = Math.pow(10, mags[i] / 20) * g; // -> linear magnitude
       const rms = (a, b) => { let s = 0; for (let i = a; i < b; i++) s += mags[i] * mags[i]; return Math.sqrt(s / (b - a)); };
       let t2 = 0;
@@ -135,7 +136,9 @@
     _detectBeat(bass, dt) {
       const now = performance.now() / 1000;
       this._bassAvg += (bass - this._bassAvg) * (1 - Math.exp(-dt * 2));
-      if (now >= this.externalBeatsUntil && bass > 0.35 && bass > this._bassAvg * 1.3 + 0.05 && now - this._lastBeat > 0.27) {
+      // more sensitive = smaller kicks count as beats (0.5 gives the original 0.35 / x1.3 thresholds)
+      const s = this.sensitivity, floor = 0.5 - 0.3 * s, jump = 1.5 - 0.4 * s;
+      if (now >= this.externalBeatsUntil && bass > floor && bass > this._bassAvg * jump + 0.05 && now - this._lastBeat > 0.27) {
         this._lastBeat = now;
         this.triggerBeat();
       }

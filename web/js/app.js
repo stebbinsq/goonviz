@@ -17,7 +17,7 @@
     feedback: "Trails", fb_zoom: "Trail zoom", fb_rotate: "Trail spin", fb_hue: "Trail hue",
     kaleido: "Kaleido", warp: "Warp", chroma: "Chroma", glow: "Glow", palette: "Palette",
     hue: "Hue", saturation: "Saturation", brightness: "Master", contrast: "Contrast",
-    video_mix: "Camera mix", cam_view: "360 view", cam_spin: "360 spin", react: "Audio react",
+    video_mix: "Camera mix", cam_view: "360 view", cam_spin: "360 spin", react: "Audio react", audio_sens: "Sensitivity",
     strobe: "Strobe", invert: "Invert", ap_intensity: "Intensity",
   };
   const ACTION_LABELS = {
@@ -66,6 +66,7 @@
         return !p.error && !(p.family === "video" && !this.engine.videoOn) && !(this.pi && p.heavy);
       });
       this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
+      this.params.get("audio_sens").setValue(store.get("audioSens", 0.5), true);
 
       this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0, transition: 0 };
       this.shift = this.frozen = this.flashHeld = false;
@@ -209,6 +210,7 @@
         }
         p.setNorm(value);
         this.pilot.touch(target);
+        if (target === "audio_sens") store.set("audioSens", p.targetValue);
         return;
       }
       const latching = source === "cc" || source === "toggle_pad";
@@ -524,6 +526,7 @@
       const P = this.params, st = this.st;
 
       this.engine.pump();
+      this.audio.sensitivity = P.v("audio_sens");
       this.audio.update(dt);
       P.update(dt);
       this.tickAutopilot(dt);
@@ -622,12 +625,13 @@
         input.oninput = () => {
           p.setNorm(+input.value);
           if (p.name === "ap_intensity") store.set("apIntensity", p.targetValue);
+          else if (p.name === "audio_sens") store.set("audioSens", p.targetValue);
           else this.pilot.touch(p.name); // autopilot leaves knobs you've moved alone until the next switch
           this.indicate("Slider", p.name);
         };
         row.appendChild(this.learnButton(p.name));
         if (p.name.startsWith("cam_")) row.classList.add("cam360");
-        (p.name === "ap_intensity" ? $("#pilotKnob") : knobs).appendChild(row);
+        (p.name === "ap_intensity" ? $("#pilotKnob") : p.name === "audio_sens" ? $("#sensKnob") : knobs).appendChild(row);
         this.sliders[p.name] = { row, input, out: row.querySelector("output"), lbl: row.querySelector(".lbl") };
       }
 

@@ -30,7 +30,7 @@ PARAM_INFO = {
     "palette": ("Palette", "10 colour sets"), "hue": ("Hue", "master colour shift"),
     "saturation": ("Saturation", "grey → vivid"), "brightness": ("MASTER", "brightness"),
     "contrast": ("Contrast", ""), "video_mix": ("Camera mix", "blend live video"),
-    "react": ("Audio react", "how hard sound hits"), "strobe": ("Strobe", "flash on beats"),
+    "react": ("Audio react", "how hard sound hits"), "audio_sens": ("Mic sensitivity", "quiet room ↑ · loud club ↓"), "strobe": ("Strobe", "flash on beats"),
     "invert": ("Invert", "negative image"), "ap_intensity": ("Autopilot", "intensity: calm → wild"),
     "cam_view": ("360 view", "flat · look · planet · hole"), "cam_spin": ("360 spin", "pan the room ◀ ▶"),
 }
@@ -231,7 +231,7 @@ def build(map_path):
         <li>Pads do nothing: on the Pi run <kbd>run.py --learn-pads</kbd> and hit the pads in order.</li>
         <li>Change any control: plug in a keyboard, <kbd>H</kbd>, ↑↓ to choose, <kbd>L</kbd>, move the control.</li>
         <li>Then reprint: <kbd>python tools/make_cheatsheet.py</kbd></li>
-        <li>No reaction to music: check the audio input; Audio react is bank B K5.</li>
+        <li>No reaction to music: check the audio input, then raise Mic sensitivity (bank B F8). Audio react (bank B K5) sets how hard it hits.</li>
       </ul></div>
       <div class="box"><h2>Keyboard</h2>
         <kbd>←</kbd><kbd>→</kbd> preset · <kbd>R</kbd> randomize · <kbd>B</kbd> blackout · <kbd>A</kbd> autopilot ·

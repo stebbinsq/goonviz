@@ -23,6 +23,7 @@ class AudioInput:
         self.samplerate = samplerate
         self.fake = fake
         self.gain = gain
+        self.sensitivity = 0.5   # the audio_sens knob: 0 deaf (loud club) .. 1 hears a quiet room
         self.noise_floor = noise_floor
 
         self.bass = self.mid = self.high = self.level = 0.0
@@ -116,7 +117,7 @@ class AudioInput:
             self._band_edges()
 
         with self._lock:
-            x = self._buf.copy() * self.gain
+            x = self._buf.copy() * (self.gain * 4.0 ** (2.0 * self.sensitivity - 1.0))   # x0.25 .. x4
         mags = np.abs(np.fft.rfft(x * self._window)) * (2.0 / self._window.sum())
 
         raw = np.array([np.sqrt(np.mean(mags[m] ** 2)) for m in self._bands] + [np.sqrt(np.mean(x ** 2))])
@@ -152,7 +153,9 @@ class AudioInput:
         self._bass_avg += (bass - self._bass_avg) * (1.0 - math.exp(-dt * 2.0))
         if now < self.external_beats_until:
             pass
-        elif bass > 0.35 and bass > self._bass_avg * 1.3 + 0.05 and now - self._last_beat > 0.27:
+        # more sensitive = smaller kicks count as beats (0.5 gives the original 0.35 / x1.3 thresholds)
+        elif (bass > 0.5 - 0.3 * self.sensitivity and bass > self._bass_avg * (1.5 - 0.4 * self.sensitivity) + 0.05
+              and now - self._last_beat > 0.27):
             self._last_beat = now
             self.trigger_beat()
         self.beat *= math.exp(-dt * 7.0)
