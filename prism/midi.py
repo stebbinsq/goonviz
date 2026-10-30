@@ -193,11 +193,11 @@ def monitor():
 
 
 def learn_pads(map_path):
-    """Hit each pad in order to record its note number, then rewrite the map.
+    """Hit each pad in order to record what it sends, then rewrite the map.
 
-    For controllers whose pads don't send the notes the map assumes. Pads are
-    learned bank by bank (in the order listed under layout.pad_banks); bindings
-    move with the pad, so pad 5 keeps doing what pad 5 did.
+    For controllers whose pads don't send what the map assumes. Pads are learned bank by bank (in the
+    order listed under layout.pad_banks); bindings move with the pad, so pad 5 keeps doing what pad 5 did.
+    Pads are recorded as "channel:note", so banks that span several MIDI channels work too.
     """
     m = MidiInput()
     if m.mido is None:
@@ -206,27 +206,23 @@ def learn_pads(map_path):
     banks = mm.extra.get("layout", {}).get("pad_banks") or {"A": [36 + i for i in range(16)]}
     remap = {}
     try:
-        for bank, old_notes in banks.items():
+        for bank, old_keys in banks.items():
             print(f"\nSelect PAD BANK {bank}, then hit its pads 1-16 in order "
                   f"(pad 1 = bottom left, along the row, then up). Ctrl+C when done.")
             got = []
-            while len(got) < len(old_notes):
+            while len(got) < len(old_keys):
                 for msg in m.poll():
-                    if msg.type == "note_on" and msg.velocity > 0 and msg.note not in got:
-                        got.append(msg.note)
-                        print(f"  pad {len(got):2d} -> note {msg.note}")
+                    key = f"{msg.channel + 1}:{msg.note}" if msg.type == "note_on" else None
+                    if key and msg.velocity > 0 and key not in got:
+                        got.append(key)
+                        print(f"  pad {len(got):2d} -> note {msg.note} (ch {msg.channel + 1})")
                 time.sleep(0.005)
-            remap.update(zip(old_notes, got))
+            remap.update({str(old): new for old, new in zip(old_keys, got)})
             banks[bank] = got
     except KeyboardInterrupt:
         print()
     if not remap:
         return
-    new_note = {}
-    for key, target in mm.note.items():
-        ch, _, num = key.rpartition(":")
-        num = remap.get(int(num), int(num))
-        new_note[f"{ch}:{num}" if ch else str(num)] = target
-    mm.note = new_note
+    mm.note = {remap.get(k, k): target for k, target in mm.note.items()}
     mm.extra.setdefault("layout", {})["pad_banks"] = banks
     mm.save()

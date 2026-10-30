@@ -96,7 +96,13 @@
     // ---- maps, snapshots ----------------------------------------------
 
     loadMap() {
-      const saved = store.get("map." + this.mapName, null);
+      let saved = store.get("map." + this.mapName, null);
+      // The first MPD32 map assumed factory preset 18 (ArkaosVJ); real controllers start on preset 1 and send
+      // different numbers. A saved copy built on that old map would hide the corrected one, so drop it.
+      if (saved && /ArkaosVJ/.test(saved.device_preset || "")) {
+        try { localStorage.removeItem("prism.map." + this.mapName); } catch (e) { /* ignore */ }
+        saved = null;
+      }
       this.map = new Prism.MidiMap(saved || D.maps[this.mapName] || {}, D.mmc);
       this.mapEdited = !!saved;
     }

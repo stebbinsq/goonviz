@@ -182,9 +182,12 @@ def build(map_path):
         f'{control_bank(b, nums, cc_map, presets)}</div>'
         for b, nums in layout.get("control_banks", {}).items()
         if any(lookup(cc_map, n) for g in nums.values() for n in g))
-    transport = "".join(cell(*label(mmc.get(k), presets), lbl)
-                        for k, lbl in (("rewind", "◀◀"), ("fast_forward", "▶▶"), ("stop", "■ STOP"),
-                                       ("play", "▶ PLAY"), ("record", "● REC")))
+    # transport buttons: CC numbers listed in the layout (e.g. preset 1), else MIDI Machine Control
+    tcc = layout.get("transport")
+    tnames = ("rewind", "fast_forward", "stop", "play", "record")
+    ttarget = (lambda i, k: lookup(cc_map, tcc[i])) if tcc else (lambda i, k: mmc.get(k))
+    transport = "".join(cell(*label(ttarget(i, k), presets), lbl)
+                        for i, (k, lbl) in enumerate(zip(tnames, ("◀◀", "▶▶", "■ STOP", "▶ PLAY", "● REC"))))
 
     rows = "".join(
         f'<tr><td class="n">{i + 1}</td><td><b>{html.escape(p.name)}</b></td>'
@@ -217,8 +220,8 @@ def build(map_path):
     <table><tr><th>#</th><th>Preset</th><th>A (K1)</th><th>B (K2)</th><th>C (K3)</th><th>D (K4)</th></tr>{rows}</table>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="box"><h2>Show checklist</h2><ol>
-        <li>Power the MPD32 and load preset <b>18 ArkaosVJ</b> before starting GoonViz.</li>
-        <li>Pads latch in that preset: every hit counts, so ignore the pad lights.</li>
+        <li>Power the MPD32. It starts on preset <b>1 LiveLite</b>, which is what this sheet is for.</li>
+        <li>Switches S1–S8 toggle: press once for on, again for off.</li>
         <li>Bring MASTER (F8) up. Keep a finger near <b>BLACKOUT</b> (S7) or ■ STOP.</li>
         <li><b>Autopilot</b> (S1 / ▶ PLAY) switches presets and keeps every knob moving. Bank B F7 sets intensity, from calm to wild.
             Any knob you touch, autopilot leaves alone until the next switch.</li>

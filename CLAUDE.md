@@ -59,8 +59,11 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## User's gear
 
-- Akai MPD32 → `maps/akai_mpd32.json`, built on its factory preset 18 "ArkaosVJ" (CC 1-72, latching pads).
-  Pad note numbers are assumed (36-99), not documented; `run.py --learn-pads` fixes them if wrong.
+- Akai MPD32 → `maps/akai_mpd32.json`, RECORDED from the user's real controller on preset 1 "LiveLite"
+  (2026-10-30): knobs CC 22-29, faders CC 12-19, switches CC 32-39 (toggle), transport CC 115-119; control bank
+  B = same CCs on channel 2. Pads are momentary: bank A = notes 60,62,64,65,67,69,71,72 on ch1 (pads 1-8) and
+  ch2 (pads 9-16); bank B = 36-51 ch3; bank C = 52-67 ch3; bank D pad 1 = 64 ch3 (overlaps C, so D is unused).
+  Map keys are "channel:number". The earlier map (factory preset 18 ArkaosVJ, from docs) was wrong for this unit.
 - Insta360 X4 over USB in Webcam Mode: 2:1 equirectangular 360 video (`video.source: "insta360"`).
   Whether its mic appears as USB audio is unverified; audio falls back to the default input.
 - Projector on HDMI 0.

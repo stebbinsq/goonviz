@@ -156,8 +156,10 @@ Everything also works as a flag: `run.py --windowed --video 0 --fake-audio --pre
 
 ## Akai MPD32
 
-The default map is built around the MPD32's factory preset **18 "ArkaosVJ"**, which Akai made for
-VJ software. Load it on the MPD32 (PRESET, turn the dial to 18, ENTER) before you start.
+The map is built for the MPD32's **preset 1 "LiveLite"**, which is what it starts on, so there's nothing to set
+up on the controller. It was recorded from a real MPD32: knobs K1–K8 send CC 22–29, faders F1–F8 CC 12–19,
+switches S1–S8 CC 32–39 (they toggle: press once for on, again for off), and the transport buttons CC 115–119.
+Control bank B sends the same numbers on MIDI channel 2.
 
 **Print the cheat sheet:** [docs/akai_mpd32_cheatsheet.pdf](docs/akai_mpd32_cheatsheet.pdf) (two pages, US Letter landscape).
 Page 1 shows every pad, knob, fader, switch and transport button; page 2 shows what knobs A–D do in each preset.
@@ -165,23 +167,17 @@ If you remap anything, regenerate it with `python tools/make_cheatsheet.py`.
 
 The main layout:
 - **Pad bank A:** presets 1–16. **Pad bank B:** preset 17, random, randomize, reset, prev/next, tap, flash, and snapshots 1–8.
-- **Pad bank C:** the kaleidoscopic set (18–23), the Jade set (24–27) and the 3D set (28–30).
+- **Pad bank C:** presets 18–31.
 - **Control bank A:**
   - Knobs: A–D, speed, zoom, palette, hue.
   - Faders: trails ×4, glow, kaleido, camera mix, MASTER.
   - Switches: autopilot, freeze, camera, strobe, invert, overlay, BLACKOUT, SHIFT.
 - **Control bank B:** warp, chroma, saturation, contrast, audio react…, the 360 view and spin (faders F5, F6), and
   **autopilot intensity** (fader F7).
-- **Transport:** ◀◀ / ▶▶ prev/next, ■ blackout, ▶ autopilot, ● randomize (sent as MMC, the default).
+- **Transport:** ◀◀ / ▶▶ prev/next, ■ blackout, ▶ autopilot, ● randomize.
 
-The ArkaosVJ preset makes pads latch (one hit = note on, the next hit = note off). Prism counts
-every hit, so latched pads behave like normal buttons. Switches work in either momentary or toggle
-mode. If pads don't respond, your unit may send different note numbers; run this once and hit the
-pads in order:
-
-```bash
-.venv/bin/python run.py --learn-pads
-```
+If you switch the MPD32 to a different preset, the numbers change. Re-map with MIDI learn (the **L** buttons), or
+on the Pi run `.venv/bin/python run.py --learn-pads` and hit the pads in order.
 
 ## Insta360 X4
 
