@@ -58,7 +58,7 @@
       this.mapName = store.get("mapName", "akai_mpd32");
       this.loadMap();
       this.snapshots = store.get("snapshots", {});
-      this.settings = Object.assign({ quality: "auto", pickup: false }, store.get("settings", {}));
+      this.settings = Object.assign({ quality: "auto", pickup: false, osd: true }, store.get("settings", {}));
       this.pilot = new Prism.Autopilot(this.params, D.kaleidoChaos, D.palettes.length);
       this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
 
@@ -235,7 +235,77 @@
         return;
       }
       const r = this.map.resolve(m);
-      if (r) this.apply(...r);
+      if (!r) return;
+      this.apply(...r);
+      const [target, , pressed, source] = r;
+      // momentary pads also send a release; only the press (or a switch turning off) is worth showing
+      if (this.params.has(target) || pressed || source === "cc") this.indicate(this.controlName(m), target);
+    }
+
+    // ---- indicator: what the last control changed ---------------------------
+
+    // The physical control behind a MIDI message, from the map's layout (e.g. "F1", "Bank B K3", "Pad C14").
+    controlName(m) {
+      const key = `${m.channel + 1}:${m.num}`;
+      const lay = this.map.extra.layout || {};
+      const is = (k) => String(k) === key || String(k) === String(m.num);
+      if (m.type === "cc") {
+        for (const [bank, groups] of Object.entries(lay.control_banks || {}))
+          for (const [g, letter] of [["knobs", "K"], ["faders", "F"], ["switches", "S"]]) {
+            const i = (groups[g] || []).findIndex(is);
+            if (i >= 0) return `${bank === "A" ? "" : "Bank " + bank + " "}${letter}${i + 1}`;
+          }
+        const t = (lay.transport || []).findIndex(is);
+        if (t >= 0) return ["◀◀", "▶▶", "■ Stop", "▶ Play", "● Rec"][t];
+        return `CC ${m.num}`;
+      }
+      if (m.type === "note_on" || m.type === "note_off") {
+        for (const [bank, notes] of Object.entries(lay.pad_banks || {})) {
+          const i = notes.findIndex((k) => String(k) === key || (!String(k).includes(":") && String(k) === String(m.num)));
+          if (i >= 0) return `Pad ${bank}${i + 1}`;
+        }
+        return `Note ${m.num}`;
+      }
+      if (m.type === "program_change") return `Program ${m.num}`;
+      return "MIDI";
+    }
+
+    // Show "<control> <what> <value>" over the visuals for a moment. Only user input calls this.
+    indicate(ctrl, target) {
+      if (!this.settings.osd) return;
+      const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+      let label, value = "", norm = null;
+      const onOff = (on) => `<span class="${on ? "on" : ""}">${on ? "ON" : "OFF"}</span>`;
+      if (this.params.has(target)) {
+        const p = this.params.get(target);
+        const presetLabel = "abcd".includes(target) && this.preset.labels[target];
+        label = (PARAM_LABELS[target] || target) + (presetLabel ? ` · ${presetLabel}` : "");
+        const v = p.targetValue;
+        value = target === "palette" ? D.palettes[Math.round(v) % D.palettes.length].name
+              : target === "kaleido" ? (v < 2 ? "off" : `${Math.round(v)} mirrors`)
+              : p.isInt ? String(Math.round(v)) : v.toFixed(2);
+        norm = p.target;
+      } else if (/^(preset:|next|prev|random_preset)/.test(target)) {
+        label = `${this.presetIndex + 1} · ${this.preset.name}`;
+      } else if (target.startsWith("snapshot:")) {
+        const slot = +target.split(":")[1];
+        label = `Snapshot ${slot + 1}`;
+        value = this.shift ? "saved" : this.snapshots[slot] ? "recalled" : "empty (hold SHIFT to save)";
+      } else {
+        label = target === "osd_on" ? "Indicator" : ACTION_LABELS[target] || target;
+        if (target === "osd_on") value = onOff(true);
+        const state = { autopilot: this.pilot.enabled, blackout: this.blackoutTarget > 0, freeze: this.frozen,
+                        video: this.videoActive, hud: this.showHud, shift: this.shift }[target];
+        if (state !== undefined) value = onOff(state);
+        if (target === "autopilot" && this.pilot.enabled) value += ` · intensity ${Math.round(this.pilot.intensity * 100)}%`;
+      }
+      const el = $("#osd");
+      el.innerHTML = `<span class="ctrl">${esc(ctrl)}</span><span class="lbl">${esc(label)}</span>` +
+        (norm !== null ? `<span class="bar"><i style="width:${Math.round(norm * 100)}%"></i></span>` : "") +
+        (value ? `<span class="val">${value.includes("<span") ? value : esc(value)}</span>` : "");
+      el.classList.add("show");
+      clearTimeout(this._osd);
+      this._osd = setTimeout(() => el.classList.remove("show"), 1600);
     }
 
     // ---- keyboard -------------------------------------------------------
@@ -251,9 +321,19 @@
         if (e.key === "Escape" && this.learning) { this.learning = null; this.refreshLearn(); return; }
         if (e.key === "Escape" && document.body.classList.contains("immersive")) { this.setImmersive(false); return; }
         if (e.key === "f") { this.toggleFullscreen(); return; }
-        if (/^[0-9]$/.test(e.key)) { this.selectPreset((parseInt(e.key, 10) + 9) % 10); return; }
+        if (e.key === "i" || e.key === "I") {
+          this.settings.osd = !this.settings.osd; store.set("settings", this.settings); $("#osdToggle").checked = this.settings.osd;
+          if (this.settings.osd) this.indicate("Key I", "osd_on"); else { $("#osd").classList.remove("show"); this.notify("indicator off"); }
+          return;
+        }
+        if (/^[0-9]$/.test(e.key)) { this.selectPreset((parseInt(e.key, 10) + 9) % 10); this.indicate(`Key ${e.key}`, "next"); return; }
         const action = keymap[e.key] || keymap[e.key.toLowerCase()];
-        if (action) { e.preventDefault(); this.doAction(action); }
+        if (action) {
+          e.preventDefault();
+          this.doAction(action);
+          const keyName = { ArrowRight: "→", ArrowLeft: "←", Backspace: "⌫" }[e.key] || e.key.toUpperCase();
+          this.indicate(`Key ${keyName}`, action);
+        }
       });
       window.addEventListener("keyup", (e) => { if (e.key === " ") this.doAction("flash", false); });
     }
@@ -371,6 +451,7 @@
         const dx = t.clientX - sx, dy = t.clientY - sy, quick = performance.now() - st < 600;
         if (quick && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
           this.doAction(dx < 0 ? "next" : "prev");
+          this.indicate(dx < 0 ? "Swipe ←" : "Swipe →", "next");
           lastTap = 0;
         } else if (Math.abs(dx) < 14 && Math.abs(dy) < 14) {
           const now = performance.now();
@@ -535,6 +616,7 @@
           p.setNorm(+input.value);
           if (p.name === "ap_intensity") store.set("apIntensity", p.targetValue);
           else this.pilot.touch(p.name); // autopilot leaves knobs you've moved alone until the next switch
+          this.indicate("Slider", p.name);
         };
         row.appendChild(this.learnButton(p.name));
         if (p.name.startsWith("cam_")) row.classList.add("cam360");
@@ -591,6 +673,8 @@
       $("#quality").value = this.settings.quality;
       $("#quality").onchange = (e) => { this.settings.quality = e.target.value; store.set("settings", this.settings); this.resize(); };
       $("#pickup").checked = this.settings.pickup;
+      $("#osdToggle").checked = this.settings.osd;
+      $("#osdToggle").onchange = (e) => { this.settings.osd = e.target.checked; store.set("settings", this.settings); if (!this.settings.osd) $("#osd").classList.remove("show"); };
       $("#pickup").onchange = (e) => { this.settings.pickup = e.target.checked; store.set("settings", this.settings); };
 
       // MIDI map

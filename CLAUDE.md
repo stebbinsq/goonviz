@@ -35,6 +35,9 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   768 px Auto target, same floor/half-rate as phones, and random_preset/autopilot skip presets whose header has
   "heavy": true (the 9 raymarched 3D/4D ones). ?profile=pi|mobile|desktop forces a profile for testing.
   Not yet tried on real Pi hardware.
+- Indicator (web App.indicate / controlName): shows physical control + what changed for user input only
+  (MIDI, keys, sliders, swipes), never autopilot. Physical names come from the map's "layout". Setting `osd`
+  (default on), key I.
 - Shaders compile in the background (KHR_parallel_shader_compile; Engine.pump/ensure): first preset is ready
   immediately, the rest within a few seconds.
 - Autopilot lives in prism/autopilot.py and web/js/autopilot.js (ports of each other); intensity is the

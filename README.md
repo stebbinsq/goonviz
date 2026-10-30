@@ -32,6 +32,10 @@ Before a show:
 - Turn off auto-lock: System Settings → Lock Screen → turn off the screen saver and display sleep while on power.
 - Print the [cheat sheet](docs/akai_mpd32_cheatsheet.pdf).
 
+**Indicator:** while you learn the controller, every move pops up in the bottom-left corner for a moment
+(e.g. `F1 · Trails 0.62`, `S7 · Blackout ON`, `Pad C14 · 31 · Hyperbolic Honeycomb`), in fullscreen too, so it also
+shows on the projector. Turn it off with the **Indicator** checkbox in Settings or the **I** key.
+
 **MIDI learn** in the browser: every slider, button and preset has a small **L**. Click it, move a control, done.
 Changes and snapshots are saved in that Mac's Chrome. Use **Export settings** / **Import** to copy them to your other Mac.
 
