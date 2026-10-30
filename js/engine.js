@@ -50,6 +50,7 @@ void main() {
       name: meta.name || key.replace(/^\d+_/, "").replace(/_/g, " "),
       params: meta.params || {},
       labels: meta.labels || {},
+      heavy: !!meta.heavy,   // raymarched 3D/4D: too much for a Raspberry Pi
       stepped: steppedKnobs(source),
       program: null, error: null,
     };
