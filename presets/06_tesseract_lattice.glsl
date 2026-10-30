@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Tesseract Lattice", "labels": {"a": "beam thickness", "b": "4D spin", "c": "beat snap", "d": "color"}, "params": {"palette": 4, "glow": 0.6, "feedback": 0.3, "chroma": 0.25, "c": 0.5}}
+// @preset {"energy": 3, "family": "flight3d", "heavy": true, "name": "Tesseract Lattice", "labels": {"a": "beam thickness", "b": "4D spin", "c": "beat snap", "d": "color"}, "params": {"palette": 4, "glow": 0.6, "feedback": 0.3, "chroma": 0.25, "c": 0.5}}
 // An endless grid of four-dimensional hypercubes (tesseracts), rotating through the 4th dimension and
 // sliced into 3D. Beams slide through each other, split and rejoin in ways that only make sense in 4D.
 // The 4D rotation snaps forward on the beat. Heavy: best on a Mac.

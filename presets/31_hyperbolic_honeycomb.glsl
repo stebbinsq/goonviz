@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Hyperbolic Honeycomb", "labels": {"a": "edge thickness", "b": "look around", "c": "stained glass", "d": "color"}, "params": {"palette": 0, "glow": 0.45, "feedback": 0.2, "chroma": 0.2, "c": 0.5}}
+// @preset {"energy": 3, "family": "flight3d", "heavy": true, "name": "Hyperbolic Honeycomb", "labels": {"a": "edge thickness", "b": "look around", "c": "stained glass", "d": "color"}, "params": {"palette": 0, "glow": 0.45, "feedback": 0.2, "chroma": 0.2, "c": 0.5}}
 // The {4,3,5} honeycomb: hyperbolic space tiled by cubes with FIVE around every edge (impossible in
 // ordinary space). Drawn in the Poincare ball, the cubes shrink forever toward a glowing horizon in every
 // direction. The camera flies cell to cell; one cell along, the view is identical, so the flight never ends.

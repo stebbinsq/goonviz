@@ -1,4 +1,4 @@
-// @preset {"name": "Hyperbolic Mandala", "labels": {"a": "polygon sides", "b": "meeting at each corner", "c": "flow", "d": "color"}, "params": {"palette": 2, "glow": 0.55, "feedback": 0.35, "chroma": 0.2, "a": 0.3, "b": 0.0}}
+// @preset {"energy": 2, "family": "mandala", "name": "Hyperbolic Mandala", "labels": {"a": "polygon sides", "b": "meeting at each corner", "c": "flow", "d": "color"}, "params": {"palette": 2, "glow": 0.55, "feedback": 0.35, "chroma": 0.2, "a": 0.3, "b": 0.0}}
 // A {p,q} tiling of the hyperbolic plane (Poincare disk, Escher's Circle Limit): polygons shrink
 // forever toward the rim. A Mobius transform keeps it flowing; outside the disk it's mirrored.
 

@@ -1,4 +1,4 @@
-// @preset {"name": "Crystal Caverns", "labels": {"a": "cave scale", "b": "wall thickness", "c": "quality (Pi: keep low)", "d": "color"}, "params": {"palette": 0, "glow": 0.55, "chroma": 0.3, "c": 0.3, "feedback": 0.25}}
+// @preset {"energy": 2, "family": "flight3d", "name": "Crystal Caverns", "labels": {"a": "cave scale", "b": "wall thickness", "c": "quality (Pi: keep low)", "d": "color"}, "params": {"palette": 0, "glow": 0.55, "chroma": 0.3, "c": 0.3, "feedback": 0.25}}
 // Flying through gyroid crystal caves: iridescent thin-film walls, fresnel rims, glowing near-misses.
 
 float caveMap(vec3 p) {

@@ -1,4 +1,4 @@
-// @preset {"name": "Wormhole", "labels": {"a": "twist", "b": "segments", "c": "ornament", "d": "color"}, "params": {"palette": 7, "glow": 0.5, "feedback": 0.5, "fb_zoom": 0.4, "chroma": 0.3}}
+// @preset {"energy": 3, "family": "tunnel", "name": "Wormhole", "labels": {"a": "twist", "b": "segments", "c": "ornament", "d": "color"}, "params": {"palette": 7, "glow": 0.5, "feedback": 0.5, "fb_zoom": 0.4, "chroma": 0.3}}
 // Infinite tunnel whose walls are tiled with glowing rosette ornaments.
 
 vec3 scene(vec2 p, vec2 uv) {

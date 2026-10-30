@@ -41,7 +41,9 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 - Shaders compile in the background (KHR_parallel_shader_compile; Engine.pump/ensure): first preset is ready
   immediately, the rest within a few seconds.
 - Autopilot lives in prism/autopilot.py and web/js/autopilot.js (ports of each other); intensity is the
-  `ap_intensity` param. Auto-exposure (Engine._meter / Engine.meter) reads the composited frame's 1x1 mip.
+  `ap_intensity` param. It's a director: energy EMAs detect drops/breakdowns, changes land on
+  phrase boundaries, presets are scored by the `energy` (1-3) and `family` fields in each `// @preset` header
+  (new presets need both), and each phrase runs a routine picked by family. The app passes a can-use check. Auto-exposure (Engine._meter / Engine.meter) reads the composited frame's 1x1 mip.
 - tools/build_web.py stamps `?v=<hash>` onto script tags so browsers never mix stale and fresh files.
 
 - All 17 presets compile as GLSL ES 3.00 in Chrome; MPD32 logic verified with simulated MIDI in the browser.

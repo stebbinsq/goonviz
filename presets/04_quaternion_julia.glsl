@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Quaternion Julia", "labels": {"a": "shape", "b": "4th-dimension slice", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 2, "glow": 0.55, "feedback": 0.2, "chroma": 0.15, "c": 0.5}}
+// @preset {"energy": 2, "family": "object3d", "heavy": true, "name": "Quaternion Julia", "labels": {"a": "shape", "b": "4th-dimension slice", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 2, "glow": 0.55, "feedback": 0.2, "chroma": 0.15, "c": 0.5}}
 // A four-dimensional Julia fractal (quaternions), sliced into 3D. The seed drifts and the slice moves
 // through the fourth dimension, so the form folds and turns inside itself in ways no 3D object can.
 // Lit like a render. Heavy: best on a Mac.

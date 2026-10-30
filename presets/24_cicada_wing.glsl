@@ -1,4 +1,4 @@
-// @preset {"name": "Cicada Wing", "labels": {"a": "wing spread", "b": "vein density", "c": "iridescence", "d": "color"}, "params": {"palette": 9, "glow": 0.5, "feedback": 0.3, "chroma": 0.2}}
+// @preset {"energy": 1, "family": "organic", "name": "Cicada Wing", "labels": {"a": "wing spread", "b": "vein density", "c": "iridescence", "d": "color"}, "params": {"palette": 9, "glow": 0.5, "feedback": 0.3, "chroma": 0.2}}
 // A cicada seen from above: mirrored translucent fore and hind wings with amber veins, a lattice of
 // cells, and thin-film iridescence that shifts as the wings flutter on the beat. Spores drift behind.
 

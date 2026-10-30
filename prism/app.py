@@ -122,6 +122,7 @@ class App:
 
         self.pilot = Autopilot(self.params, KALEIDO_CHAOS, len(PALETTES))
         self.pilot.enabled = cfg["autopilot"]["enabled"]
+        self.pilot.configure(self.presets, self._pilot_can_use)
         self.params["ap_intensity"].set_value(cfg["autopilot"].get("intensity", 0.5), immediate=True)
         self.items = [p.name for p in self.params.list] + ACTION_ITEMS
         self.selected = 0
@@ -163,8 +164,16 @@ class App:
         self.params.load_preset(preset.params)
         self.picked.clear()
         if hasattr(self, "pilot"):
-            self.pilot.start_preset(preset.stepped)
+            self.pilot.start_preset(preset)
         self.notify(preset.name)
+
+    def _pilot_can_use(self, i):
+        """Presets autopilot may switch to now: compiled, camera presets only with a camera running,
+        and on a Pi (any ARM board) none of the heavy 3D/4D ones."""
+        p = self.presets[i]
+        if not p.program or (self.low_power and p.heavy):
+            return False
+        return p.family != "video" or bool(self.video and self.video.active)
 
     @property
     def preset(self):
@@ -221,7 +230,7 @@ class App:
             self.pilot.enabled = not self.pilot.enabled
             if self.pilot.enabled:
                 self.pilot.home_hue = None
-                self.pilot.start_preset(self.preset.stepped)
+                self.pilot.start_preset(self.preset)
             self.notify(f"autopilot {'on' if self.pilot.enabled else 'off'}")
         elif action == "blackout":
             self.blackout_target = 1.0 - self.blackout_target
@@ -361,12 +370,13 @@ class App:
     def tick_autopilot(self, dt):
         beats = self.audio.beat_count - self.last_beat_count
         self.last_beat_count = self.audio.beat_count
-        for event in self.pilot.update(dt, beats):
-            if event == "switch":
-                self.do_action("random_preset")
-                self.pilot.on_switched()
-            elif event == "flash":
-                self.state["flash"] = 0.7
+        for event in self.pilot.update(dt, beats, self.audio.level):
+            if event[0] == "switch":
+                self.select_preset(event[1])     # select_preset hands the new preset to the pilot
+                if event[2]:
+                    self.state["transition"] = 0.0   # a drop: hard cut instead of a melt
+            elif event[0] == "flash":
+                self.state["flash"] = max(self.state["flash"], event[1])
 
     def hud_lines(self):
         white, dim, hot, warn = (235, 235, 235), (140, 140, 160), (255, 200, 90), (255, 110, 110)
@@ -379,7 +389,7 @@ class App:
             (f"video {self.video.status if self.video else 'none'}   midi {', '.join(self.midi.ports) or 'no device'}", dim),
             (f"last midi: {self.midi.last_message}", dim),
         ]
-        flags = [f for f, on in ((f"AUTOPILOT {self.pilot.intensity:.0%}", self.pilot.enabled), ("FROZEN", self.frozen),
+        flags = [f for f, on in ((f"AUTOPILOT {self.pilot.intensity:.0%} {self.pilot.status()} · {self.pilot.beats_until_switch()} beats", self.pilot.enabled), ("FROZEN", self.frozen),
                                  ("BLACKOUT", self.blackout_target > 0), ("SHIFT", self.shift)) if on]
         if flags:
             lines.append(("  ".join(flags), hot))

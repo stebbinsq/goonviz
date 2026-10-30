@@ -1,4 +1,4 @@
-// @preset {"name": "Apollonian Lace", "labels": {"a": "inversion", "b": "drift", "c": "lace brightness", "d": "color"}, "params": {"palette": 6, "glow": 0.5, "feedback": 0.25, "zoom": 0.9, "kaleido": 6, "fb_rotate": 0.15}}
+// @preset {"energy": 2, "family": "fractal2d", "name": "Apollonian Lace", "labels": {"a": "inversion", "b": "drift", "c": "lace brightness", "d": "color"}, "params": {"palette": 6, "glow": 0.5, "feedback": 0.25, "zoom": 0.9, "kaleido": 6, "fb_rotate": 0.15}}
 // Circle-inversion fractal (Apollonian gasket): infinite nested bubbles traced in light.
 
 vec3 scene(vec2 p, vec2 uv) {

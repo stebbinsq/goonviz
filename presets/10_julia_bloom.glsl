@@ -1,4 +1,4 @@
-// @preset {"name": "Julia Bloom", "labels": {"a": "seed angle", "b": "morph speed", "c": "detail", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.35, "fb_rotate": 0.1, "a": 0.55}}
+// @preset {"energy": 1, "family": "fractal2d", "name": "Julia Bloom", "labels": {"a": "seed angle", "b": "morph speed", "c": "detail", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.35, "fb_rotate": 0.1, "a": 0.55}}
 // Julia set whose seed orbits the Mandelbrot boundary (where all the lacy spirals live),
 // coloured by smooth escape time and orbit traps.
 

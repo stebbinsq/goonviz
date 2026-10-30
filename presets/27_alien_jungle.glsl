@@ -1,4 +1,4 @@
-// @preset {"name": "Alien Jungle", "labels": {"a": "leaf size", "b": "sway", "c": "fireflies", "d": "color"}, "params": {"palette": 8, "glow": 0.6, "feedback": 0.3, "chroma": 0.15}}
+// @preset {"energy": 1, "family": "organic", "name": "Alien Jungle", "labels": {"a": "leaf size", "b": "sway", "c": "fireflies", "d": "color"}, "params": {"palette": 8, "glow": 0.6, "feedback": 0.3, "chroma": 0.15}}
 // Three depths of glowing alien leaves: pointed blades with a midrib and chevron side veins, swaying,
 // lit along their edges, with fireflies hanging in the haze between the layers.
 

@@ -60,6 +60,11 @@
       this.snapshots = store.get("snapshots", {});
       this.settings = Object.assign({ quality: "auto", pickup: false, osd: true }, store.get("settings", {}));
       this.pilot = new Prism.Autopilot(this.params, D.kaleidoChaos, D.palettes.length);
+      // autopilot may only pick what works right now: no camera presets without a camera, nothing heavy on a Pi
+      this.pilot.configure(this.presets, (i) => {
+        const p = this.presets[i];
+        return !p.error && !(p.family === "video" && !this.engine.videoOn) && !(this.pi && p.heavy);
+      });
       this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
 
       this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0, transition: 0 };
@@ -148,7 +153,7 @@
       }
       this.params.loadPreset(this.preset.params);
       this.picked.clear();
-      this.pilot?.startPreset(this.preset.stepped);
+      this.pilot?.startPreset(this.preset);
       this.notify(this.preset.name);
       this.refreshPresetButtons();
       this.refreshLabels();
@@ -169,7 +174,7 @@
       else if (action === "reset") { this.params.loadPreset(this.preset.params); this.picked.clear(); }
       else if (action === "autopilot") {
         this.pilot.enabled = !this.pilot.enabled;
-        if (this.pilot.enabled) { this.pilot.homeHue = null; this.pilot.startPreset(this.preset.stepped); }
+        if (this.pilot.enabled) { this.pilot.homeHue = null; this.pilot.startPreset(this.preset); }
         this.notify(`autopilot ${this.pilot.enabled ? "on" : "off"}`);
       }
       else if (action === "blackout") this.blackoutTarget = 1 - this.blackoutTarget;
@@ -543,9 +548,11 @@
     tickAutopilot(dt) {
       const beats = this.audio.beatCount - this.lastBeatCount;
       this.lastBeatCount = this.audio.beatCount;
-      for (const event of this.pilot.update(dt, beats)) {
-        if (event === "switch") { this.doAction("random_preset"); this.pilot.onSwitched(); }
-        else if (event === "flash") this.st.flash = 0.7;
+      for (const ev of this.pilot.update(dt, beats, this.audio)) {
+        if (ev.type === "switch") {
+          this.selectPreset(ev.index);          // also restarts the pilot's phrase on the new preset
+          if (ev.cut) this.st.transition = 0;   // drops cut hard instead of melting
+        } else if (ev.type === "flash") this.st.flash = Math.max(this.st.flash, ev.amount);
       }
     }
 
@@ -759,8 +766,8 @@
       $("#camStatus").textContent = this.camStatus || "off";
       const I = this.pilot.intensity;
       $("#pilotInfo").textContent = this.pilot.enabled
-        ? `next preset in ${this.pilot.beatsUntilSwitch()} beats · knobs gliding${I > 0.4 ? " · beat jumps" : ""}${I > 0.8 ? " · flashes" : ""}`
-        : `switches every ${this.pilot.switchBeats()} beats; knobs keep moving in between`;
+        ? `${this.pilot.status()} · next change in ${this.pilot.beatsUntilSwitch()} beats`
+        : `changes every ${this.pilot.phraseBeats()} beats, follows drops and breakdowns`;
       $("#hud").innerHTML = `<b>${this.preset.name}</b> · ${Math.round(this.fps)} fps` +
         (this.pilot.enabled ? ` · AUTOPILOT ${Math.round(this.pilot.intensity * 100)}%` : "") + (this.frozen ? " · FROZEN" : "") +
         (this.blackoutTarget ? " · BLACKOUT" : "") + (this.shift ? " · SHIFT" : "");

@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Fractal Cathedral", "labels": {"a": "hall width", "b": "twist", "c": "beat snap", "d": "color"}, "params": {"palette": 0, "glow": 0.6, "feedback": 0.2, "chroma": 0.15, "c": 0.5, "speed": 0.9}}
+// @preset {"energy": 3, "family": "flight3d", "heavy": true, "name": "Fractal Cathedral", "labels": {"a": "hall width", "b": "twist", "c": "beat snap", "d": "color"}, "params": {"palette": 0, "glow": 0.6, "feedback": 0.2, "chroma": 0.15, "c": 0.5, "speed": 0.9}}
 // Flying down the halls of an endless Menger-sponge cathedral, lit like a render: ambient occlusion in
 // every crevice, two coloured lights, iridescent rims and glowing seams. On each beat the camera snaps
 // a precise fraction of a turn and settles. Heavy: best on a Mac.

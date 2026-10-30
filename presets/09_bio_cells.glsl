@@ -1,4 +1,4 @@
-// @preset {"name": "Bioluminescence", "labels": {"a": "cell size", "b": "wobble", "c": "nuclei", "d": "color"}, "params": {"palette": 4, "glow": 0.6, "feedback": 0.3}}
+// @preset {"energy": 1, "family": "organic", "name": "Bioluminescence", "labels": {"a": "cell size", "b": "wobble", "c": "nuclei", "d": "color"}, "params": {"palette": 4, "glow": 0.6, "feedback": 0.3}}
 // Living Voronoi tissue: glowing membranes, and each cell's nucleus pulses with its own slice of the spectrum.
 
 vec3 voronoi(vec2 x) {

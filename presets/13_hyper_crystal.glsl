@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Hyper Crystal", "labels": {"a": "fold angle", "b": "4th-dimension slice", "c": "facets", "d": "color"}, "params": {"palette": 4, "glow": 0.6, "feedback": 0.25, "chroma": 0.2}}
+// @preset {"energy": 2, "family": "object3d", "heavy": true, "name": "Hyper Crystal", "labels": {"a": "fold angle", "b": "4th-dimension slice", "c": "facets", "d": "color"}, "params": {"palette": 4, "glow": 0.6, "feedback": 0.25, "chroma": 0.2}}
 // A kaleidoscopic fractal folded in four dimensions and sliced into 3D: a crystal that keeps re-faceting
 // itself as the slice moves through the 4th dimension. Glassy rims, glowing inner edges.
 // Heavy: best on a Mac.

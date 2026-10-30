@@ -1,4 +1,4 @@
-// @preset {"name": "Astral Mandala", "labels": {"a": "petals", "b": "layers", "c": "filigree", "d": "color drift"}, "params": {"palette": 0, "glow": 0.55, "feedback": 0.45, "fb_zoom": 0.2, "a": 0.4, "b": 0.7}}
+// @preset {"energy": 2, "family": "mandala", "name": "Astral Mandala", "labels": {"a": "petals", "b": "layers", "c": "filigree", "d": "color drift"}, "params": {"palette": 0, "glow": 0.55, "feedback": 0.45, "fb_zoom": 0.2, "a": 0.4, "b": 0.7}}
 // Concentric scalloped rings of glowing filigree, counter-rotating, with beads of light.
 
 vec3 scene(vec2 p, vec2 uv) {

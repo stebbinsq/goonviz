@@ -1,4 +1,4 @@
-// @preset {"name": "Fractal Temple", "labels": {"a": "symmetry", "b": "spread", "c": "fold angle", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.3, "chroma": 0.2}}
+// @preset {"energy": 2, "family": "kaleido", "name": "Fractal Temple", "labels": {"a": "symmetry", "b": "spread", "c": "fold angle", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.3, "chroma": 0.2}}
 // Kaleidoscopic IFS: repeated mirror-fold-rotate-scale, with glowing line and ring traps.
 
 vec3 scene(vec2 p, vec2 uv) {

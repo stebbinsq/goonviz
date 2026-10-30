@@ -1,4 +1,4 @@
-// @preset {"name": "Video Melt (video)", "labels": {"a": "melt", "b": "flow speed", "c": "contours", "d": "color"}, "params": {"palette": 0, "glow": 0.4, "feedback": 0.5, "fb_zoom": 0.1, "warp": 0.15}}
+// @preset {"energy": 1, "family": "video", "name": "Video Melt (video)", "labels": {"a": "melt", "b": "flow speed", "c": "contours", "d": "color"}, "params": {"palette": 0, "glow": 0.4, "feedback": 0.5, "fb_zoom": 0.1, "warp": 0.15}}
 // Video poured through a domain-warped flow field, then gradient-mapped to the palette.
 
 vec3 scene(vec2 p, vec2 uv) {

@@ -1,4 +1,4 @@
-// @preset {"name": "Prism Shards", "labels": {"a": "shard size", "b": "refraction", "c": "seed light", "d": "color"}, "params": {"palette": 2, "glow": 0.2, "feedback": 0.0, "fb_hue": 0.0, "chroma": 0.35, "c": 0.6}}
+// @preset {"energy": 3, "family": "kaleido", "name": "Prism Shards", "labels": {"a": "shard size", "b": "refraction", "c": "seed light", "d": "color"}, "params": {"palette": 2, "glow": 0.2, "feedback": 0.0, "fb_hue": 0.0, "chroma": 0.35, "c": 0.6}}
 // Crystal shards that each show a turned, zoomed reflection of the previous frame. The image recurses
 // into itself forever; a mandala of light seeds it, and the camera can too (camera mix fader).
 

@@ -1,4 +1,4 @@
-// @preset {"name": "Liquid Spirit", "labels": {"a": "turbulence", "b": "filaments", "c": "filament count", "d": "color"}, "params": {"palette": 1, "glow": 0.55, "feedback": 0.4, "fb_zoom": 0.1}}
+// @preset {"energy": 1, "family": "organic", "name": "Liquid Spirit", "labels": {"a": "turbulence", "b": "filaments", "c": "filament count", "d": "color"}, "params": {"palette": 1, "glow": 0.55, "feedback": 0.4, "fb_zoom": 0.1}}
 // Ink in water: domain-warped noise, mostly dark, with luminous filaments riding the flow.
 
 vec3 scene(vec2 p, vec2 uv) {

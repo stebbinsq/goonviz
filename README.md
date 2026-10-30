@@ -205,18 +205,31 @@ Some caveats:
 
 ## Autopilot
 
-Turn it on (switch S1, ▶ PLAY on the MPD32, **A** on the keyboard, or the panel button) and GoonViz plays itself.
+Turn it on (switch S1, ▶ PLAY on the MPD32, **A** on the keyboard, or the panel button) and GoonViz plays itself
+like a VJ: it listens to the shape of the music and performs planned moves instead of random ones.
 **Intensity** (bank B fader F7, or the slider in the panel) sets how hard:
 
 | | calm (0) | middle (0.5) | wild (1) |
 |---|---|---|---|
-| preset switches | every 64 beats | every 36 beats | every 8 beats |
-| knobs | slow, small drifts | wider sweeps | fast, full-range |
-| on the beat | nothing | nothing | kaleidoscope and palette jumps, flashes |
+| preset changes | every 64 beats | every 32 beats | every 8 beats |
+| moves | small and slow | bigger | full size, quick |
+| drops | follow on the next phrase | hard cut to something intense | hard cut plus a flash |
 
-Between switches it keeps gliding A–D, trails, warp, glow, zoom, chroma and speed toward new targets, and
-wobbles the hue around wherever you left it. Any knob you move yourself is left alone until the next switch,
-so you can steer one thing while autopilot handles the rest.
+- **Phrases:** changes land on phrase boundaries (8/16/32/64 beats), never mid-phrase, unless the music drops.
+- **Sections:** it compares the last second of loudness with the last ten or so. A sudden jump after a quieter
+  stretch is a **drop**, so it cuts to an intense preset. A long quiet stretch is a **breakdown**, so it moves to
+  a calm one. The panel shows what it's doing, e.g. "Dive · DROP · next change in 12 beats".
+- **Choosing presets:** each preset has an energy (calm 1 … intense 3) and a style family (mandala, kaleido,
+  2D fractal, organic, tunnel, 3D flight, 3D object, camera). It picks one whose energy suits the music, in a
+  different family from the last, and not one shown recently. Camera presets only come up while the camera
+  is on, and heavy 3D/4D ones never on a Pi.
+- **Routines:** each phrase it performs one move that suits the preset: *Spin* (trails swirl, the kaleidoscope
+  steps up each bar), *Bloom* (glow and trails build toward the change), *Dive* (fly faster, trails stream
+  forward), *Breathe* (zoom and glow pulse in four-bar cycles), *Colour walk* (the hue wanders away and back)
+  or *Drift*. Underneath, the other knobs drift gently within ranges that keep the picture good-looking.
+
+Any knob you move yourself is left alone until the next change, so you can steer one thing while autopilot
+handles the rest.
 
 Presets **melt** into each other over about a second instead of cutting. Knobs a preset uses as a count
 (petals, polygon sides, chambers: anything it rounds to a whole number) are never glided by autopilot,

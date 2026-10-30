@@ -1,4 +1,4 @@
-// @preset {"name": "Kaleido Bloom", "labels": {"a": "petals", "b": "layers", "c": "inner detail", "d": "color"}, "params": {"palette": 0, "glow": 0.55, "feedback": 0.4, "fb_zoom": 0.15, "a": 0.4, "b": 0.7, "c": 0.6}}
+// @preset {"energy": 2, "family": "mandala", "name": "Kaleido Bloom", "labels": {"a": "petals", "b": "layers", "c": "inner detail", "d": "color"}, "params": {"palette": 0, "glow": 0.55, "feedback": 0.4, "fb_zoom": 0.15, "a": 0.4, "b": 0.7, "c": 0.6}}
 // Layer upon layer of counter-rotating petal rings, each petal holding its own smaller rosette.
 
 vec3 rosette(vec2 q, float n, float w, vec3 c1, vec3 c2) {

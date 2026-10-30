@@ -1,4 +1,4 @@
-// @preset {"name": "Spirit Mirror (video)", "labels": {"a": "edge gain", "b": "aura", "c": "body fill", "d": "color"}, "params": {"palette": 2, "glow": 0.7, "feedback": 0.75, "fb_zoom": 0.2, "fb_hue": 0.1, "kaleido": 0}}
+// @preset {"energy": 2, "family": "video", "name": "Spirit Mirror (video)", "labels": {"a": "edge gain", "b": "aura", "c": "body fill", "d": "color"}, "params": {"palette": 2, "glow": 0.7, "feedback": 0.75, "fb_zoom": 0.2, "fb_hue": 0.1, "kaleido": 0}}
 // The camera image traced as a glowing energy body: neon edges, a palette-mapped aura, feedback trails.
 // No camera? It processes its own feedback instead.
 

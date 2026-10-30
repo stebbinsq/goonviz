@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Chrome Lattice", "labels": {"a": "tube thickness", "b": "ripple", "c": "beat snap", "d": "color"}, "params": {"palette": 0, "glow": 0.5, "feedback": 0.25, "chroma": 0.12, "c": 0.5}}
+// @preset {"energy": 3, "family": "flight3d", "heavy": true, "name": "Chrome Lattice", "labels": {"a": "tube thickness", "b": "ripple", "c": "beat snap", "d": "color"}, "params": {"palette": 0, "glow": 0.5, "feedback": 0.25, "chroma": 0.12, "c": 0.5}}
 // Flying through an infinite lattice of liquid-chrome tubes. The chrome reflects a glowing environment
 // built from the palette, ripples with the bass, and the camera snaps on the beat. Heavy: best on a Mac.
 

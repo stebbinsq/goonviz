@@ -1,4 +1,4 @@
-// @preset {"name": "Mandala Mandelbox", "labels": {"a": "fold scale", "b": "symmetry", "c": "detail", "d": "color"}, "params": {"palette": 3, "glow": 0.5, "feedback": 0.3, "a": 0.5, "b": 0.5}}
+// @preset {"energy": 2, "family": "fractal2d", "name": "Mandala Mandelbox", "labels": {"a": "fold scale", "b": "symmetry", "c": "detail", "d": "color"}, "params": {"palette": 3, "glow": 0.5, "feedback": 0.3, "a": 0.5, "b": 0.5}}
 // A 2D Mandelbox (box fold + sphere fold + scale) behind a kaleidoscope: dense jewelled filigree
 // coloured by orbit traps.
 

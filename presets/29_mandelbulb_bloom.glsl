@@ -1,4 +1,4 @@
-// @preset {"heavy": true, "name": "Mandelbulb Bloom", "labels": {"a": "power", "b": "orbit distance", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 2, "glow": 0.6, "feedback": 0.25, "chroma": 0.25, "c": 0.5}}
+// @preset {"energy": 2, "family": "object3d", "heavy": true, "name": "Mandelbulb Bloom", "labels": {"a": "power", "b": "orbit distance", "c": "detail (heavy)", "d": "color"}, "params": {"palette": 2, "glow": 0.6, "feedback": 0.25, "chroma": 0.25, "c": 0.5}}
 // The 3D Mandelbrot set, slowly morphing its power, orbited by the camera and lit like a render:
 // colour from orbit traps, ambient occlusion from the fractal's own iteration depth, rim light and a halo.
 // Heavy: best on a Mac.

@@ -1,4 +1,4 @@
-// @preset {"name": "Crystal Kaleidoscope", "labels": {"a": "cell size", "b": "turbulence", "c": "camera (0 = none)", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.3, "chroma": 0.25, "c": 0.0}}
+// @preset {"energy": 2, "family": "kaleido", "name": "Crystal Kaleidoscope", "labels": {"a": "cell size", "b": "turbulence", "c": "camera (0 = none)", "d": "color"}, "params": {"palette": 2, "glow": 0.5, "feedback": 0.3, "chroma": 0.25, "c": 0.0}}
 // A real mirror kaleidoscope: a hex lattice of 12-way mirrored cells (wallpaper group p6m), seamless
 // across every edge. The "glass" holds flowing ink and jewels, and knob C pours in the camera.
 

@@ -1,4 +1,4 @@
-// @preset {"name": "Kaleido Tunnel", "labels": {"a": "segments", "b": "rings per depth", "c": "ornament", "d": "color"}, "params": {"palette": 7, "glow": 0.55, "feedback": 0.45, "fb_zoom": 0.35, "chroma": 0.3, "speed": 1.1}}
+// @preset {"energy": 3, "family": "tunnel", "name": "Kaleido Tunnel", "labels": {"a": "segments", "b": "rings per depth", "c": "ornament", "d": "color"}, "params": {"palette": 7, "glow": 0.55, "feedback": 0.45, "fb_zoom": 0.35, "chroma": 0.3, "speed": 1.1}}
 // Endless rings of ornate kaleidoscopic tiles stream toward you. Log-polar space makes every ring a
 // scaled copy of the last, so the tunnel is self-similar at every depth.
 

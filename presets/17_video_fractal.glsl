@@ -1,4 +1,4 @@
-// @preset {"name": "Video Fractal (video)", "labels": {"a": "folds", "b": "spread", "c": "tint", "d": "color"}, "params": {"palette": 0, "glow": 0.5, "feedback": 0.4, "chroma": 0.3}}
+// @preset {"energy": 3, "family": "video", "name": "Video Fractal (video)", "labels": {"a": "folds", "b": "spread", "c": "tint", "d": "color"}, "params": {"palette": 0, "glow": 0.5, "feedback": 0.4, "chroma": 0.3}}
 // The video fed into a kaleidoscopic fold fractal: infinite mirrored copies of the room.
 
 vec3 scene(vec2 p, vec2 uv) {

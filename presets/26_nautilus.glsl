@@ -1,4 +1,4 @@
-// @preset {"name": "Nautilus", "labels": {"a": "spiral growth", "b": "chambers", "c": "nacre sheen", "d": "color"}, "params": {"palette": 8, "glow": 0.5, "feedback": 0.25, "fb_rotate": 0.12}}
+// @preset {"energy": 1, "family": "organic", "name": "Nautilus", "labels": {"a": "spiral growth", "b": "chambers", "c": "nacre sheen", "d": "color"}, "params": {"palette": 8, "glow": 0.5, "feedback": 0.25, "fb_rotate": 0.12}}
 // A chambered shell growing on a logarithmic spiral: glowing septa between chambers, a mother-of-pearl
 // sheen that shifts like thin film, and the whole shell slowly turning.
 

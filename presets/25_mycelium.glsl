@@ -1,4 +1,4 @@
-// @preset {"name": "Mycelium", "labels": {"a": "network scale", "b": "thread sharpness", "c": "pulse speed", "d": "color"}, "params": {"palette": 8, "glow": 0.6, "feedback": 0.45, "fb_zoom": 0.08, "warp": 0.08}}
+// @preset {"energy": 1, "family": "organic", "name": "Mycelium", "labels": {"a": "network scale", "b": "thread sharpness", "c": "pulse speed", "d": "color"}, "params": {"palette": 8, "glow": 0.6, "feedback": 0.45, "fb_zoom": 0.08, "warp": 0.08}}
 // A living fungal network: ridged noise draws branching threads, and pulses of light travel along them
 // with the music. Fruiting nodes swell on the beat.
 
