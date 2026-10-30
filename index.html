@@ -41,6 +41,17 @@
     background: rgba(0,0,0,.72); opacity: 0; transition: opacity .25s; pointer-events: none; white-space: nowrap; }
   #toast.show { opacity: 1; }
   #stage:fullscreen #toast { display: none; }
+  /* indicator: what the last control changed (stays readable on a projector) */
+  #osd { position: absolute; left: 16px; bottom: 16px; display: flex; align-items: center; gap: 12px; max-width: calc(100% - 32px);
+    padding: 10px 16px; border-radius: 10px; background: rgba(0,0,0,.72); border: 1px solid rgba(255,255,255,.12);
+    font-size: clamp(14px, 1.5vw, 26px); opacity: 0; transition: opacity .35s; pointer-events: none; white-space: nowrap; }
+  #osd.show { opacity: 1; transition: opacity .08s; }
+  #osd .ctrl { font: 700 .8em ui-monospace, Menlo, monospace; color: #000; background: var(--gold); padding: 2px 8px; border-radius: 5px; }
+  #osd .lbl { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+  #osd .val { color: var(--accent2); font-variant-numeric: tabular-nums; }
+  #osd .bar { width: 7em; height: .45em; border-radius: 1em; background: rgba(255,255,255,.15); overflow: hidden; flex: none; }
+  #osd .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+  #osd .on { color: var(--gold); font-weight: 700; }
   .intro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
     background: radial-gradient(ellipse at center, rgba(7,6,13,.25), rgba(7,6,13,.85)); text-align: center; padding: 20px; }
   .intro p { color: var(--dim); max-width: 440px; margin: 0; }
@@ -138,6 +149,7 @@
       <canvas id="view"></canvas>
       <div id="hud" hidden></div>
       <div id="toast"></div>
+      <div id="osd"></div>
       <div class="intro">
         <button class="btn primary" id="start">Start GoonViz</button>
         <p id="introText">Chrome will ask to use your camera, microphone and MIDI devices. Allow all three for the full experience;
@@ -184,6 +196,7 @@
     <p class="hint">Every slider, button and preset has an <b>L</b>: click it, then move a control on your controller to map it.
        Changes save in this browser.</p>
     <div class="field"><span>Pickup</span><label class="check"><input type="checkbox" id="pickup"> knobs wait to reach the current value</label></div>
+    <div class="field"><span>Indicator</span><label class="check"><input type="checkbox" id="osdToggle"> show what each control changes (also on the projector) · key <kbd>I</kbd></label></div>
 
     <h2>Settings</h2>
     <div class="field"><span>Quality</span>
@@ -205,18 +218,18 @@
       <kbd>←</kbd><kbd>→</kbd> preset · <kbd>1</kbd>–<kbd>0</kbd> presets 1–10 · <kbd>F</kbd> projector<br>
       <kbd>R</kbd> randomize · <kbd>P</kbd> random preset · <kbd>⌫</kbd> reset knobs<br>
       <kbd>B</kbd> blackout · <kbd>A</kbd> autopilot · <kbd>Z</kbd> freeze · <kbd>T</kbd> tap<br>
-      <kbd>Space</kbd> flash (hold) · <kbd>V</kbd> camera · <kbd>H</kbd> overlay · <kbd>Esc</kbd> exit fullscreen
+      <kbd>Space</kbd> flash (hold) · <kbd>V</kbd> camera · <kbd>H</kbd> overlay · <kbd>I</kbd> indicator · <kbd>Esc</kbd> exit fullscreen
     </div>
   </aside>
 </div>
 
 <video id="cam" playsinline muted hidden></video>
-<script src="bundle.js?v=b39b678db8"></script>
-<script src="js/params.js?v=b39b678db8"></script>
-<script src="js/audio.js?v=b39b678db8"></script>
-<script src="js/midi.js?v=b39b678db8"></script>
-<script src="js/autopilot.js?v=b39b678db8"></script>
-<script src="js/engine.js?v=b39b678db8"></script>
-<script src="js/app.js?v=b39b678db8"></script>
+<script src="bundle.js?v=5f44afe59f"></script>
+<script src="js/params.js?v=5f44afe59f"></script>
+<script src="js/audio.js?v=5f44afe59f"></script>
+<script src="js/midi.js?v=5f44afe59f"></script>
+<script src="js/autopilot.js?v=5f44afe59f"></script>
+<script src="js/engine.js?v=5f44afe59f"></script>
+<script src="js/app.js?v=5f44afe59f"></script>
 </body>
 </html>
