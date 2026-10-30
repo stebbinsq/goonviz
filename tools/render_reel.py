@@ -61,7 +61,7 @@ def main():
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     writer = imageio_ffmpeg.write_frames(args.out, (w, h), fps=args.fps, codec="libx264",
-                                         pix_fmt_out="yuv420p", quality=6, macro_block_size=2)
+                                         pix_fmt_out="yuv420p", quality=5, macro_block_size=2)
     writer.send(None)
 
     dt = 1.0 / args.fps

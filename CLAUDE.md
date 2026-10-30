@@ -17,6 +17,9 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 - 30 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
+- 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
+  translation one cell per loop. Colour/fade must depend only on things invariant under that translation
+  (hyperbolic distance from camera, folded coordinates), never the inversion count, or the loop shows a seam.
 - Earlier presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
   "Jade Cicada"-style organic visuals), 3D raymarched set (28–30, Tipper-inspired: rendered-looking fractal
   worlds with beat-snapped camera moves). 10 palettes.

@@ -43,7 +43,8 @@ more than 60 fps; on a 120 Hz display GoonViz will run at 120 when the preset al
 
 The **3D and 4D sets** are raymarched: full scenes with lighting. 3D: Mandelbox, Apollonian Foam, Fractal Cathedral,
 Mandelbulb Bloom, Chrome Lattice. 4D (four-dimensional shapes sliced into 3D as they turn through the 4th
-dimension): Quaternion Julia, Tesseract Lattice, Hyper Crystal, Hypergyroid. They're the heaviest presets and are
+dimension): Quaternion Julia, Tesseract Lattice, Hyper Crystal, Hypergyroid. Hyperbolic: Hyperbolic Honeycomb,
+a flight through the {4,3,5} honeycomb (cubes, five around every edge) in the Poincaré ball that loops seamlessly. They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light
