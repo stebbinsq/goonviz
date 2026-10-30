@@ -86,8 +86,12 @@ void main() {
       this.comp = this.program(S.lib + S.composite);
       this.disp = this.program(S.lib + S.display);
       this.presets = data.presets.map((p) => parsePreset(p.key, p.source));
-      for (const p of this.presets) this.compilePreset(p);
-      if (!this.presets.some((p) => p.program)) throw new Error("no presets compiled; see console");
+      // Compile the first working preset now, the rest in the background (see pump), so the page is up
+      // in a moment even on a phone. With KHR_parallel_shader_compile the driver compiles them all in
+      // parallel; without it pump() finishes one per frame.
+      this.parallel = gl.getExtension("KHR_parallel_shader_compile");
+      if (!this.presets.some((p) => this.ensure(p))) throw new Error("no presets compiled; see console");
+      if (this.parallel) for (const p of this.presets) if (!p.program && !p.error) this.startPreset(p);
 
       this.palettes = data.palettes.map((p) => p.colors.map(hexToRgb));
       this.palette = new Float32Array(this.palettes[0].flat());
@@ -123,14 +127,31 @@ void main() {
       return sh;
     }
 
-    program(frag) {
+    // Two-phase build: startProgram() kicks off compile + link without asking for the result (asking
+    // blocks until the GPU driver is done); finishProgram() collects it.
+    startProgram(frag) {
       const gl = this.gl;
+      const mk = (type, src) => { const sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh); return sh; };
+      const vs = mk(gl.VERTEX_SHADER, HEADER + VERT);
+      const fs = mk(gl.FRAGMENT_SHADER, HEADER + frag);
       const prog = gl.createProgram();
-      gl.attachShader(prog, this.shader(gl.VERTEX_SHADER, HEADER + VERT));
-      gl.attachShader(prog, this.shader(gl.FRAGMENT_SHADER, HEADER + frag));
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
       gl.bindAttribLocation(prog, 0, "in_pos");
       gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+      return { prog, vs, fs };
+    }
+
+    finishProgram(job) {
+      const gl = this.gl;
+      const { prog, vs, fs } = job;
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        const log = gl.getShaderInfoLog(fs) || gl.getShaderInfoLog(vs) || gl.getProgramInfoLog(prog);
+        gl.deleteProgram(prog);
+        throw new Error(log);
+      }
+      gl.detachShader(prog, vs); gl.deleteShader(vs);
+      gl.detachShader(prog, fs); gl.deleteShader(fs);
       const uniforms = {};
       const n = gl.getProgramParameter(prog, gl.ACTIVE_UNIFORMS);
       for (let i = 0; i < n; i++) {
@@ -141,17 +162,48 @@ void main() {
       return { prog, uniforms };
     }
 
-    compilePreset(preset) {
+    program(frag) { return this.finishProgram(this.startProgram(frag)); }
+
+    startPreset(preset) {
       const S = this.data.shaders;
+      preset.job = this.startProgram(S.lib + S.scene_header + preset.source + SCENE_MAIN);
+    }
+
+    finishPreset(preset) {
       try {
-        preset.program = this.program(S.lib + S.scene_header + preset.source + SCENE_MAIN);
+        preset.program = this.finishProgram(preset.job);
         preset.error = null;
       } catch (e) {
         preset.error = String(e.message || e);
         console.error(`[preset] ${preset.key} failed to compile:\n${preset.error}`);
       }
-      return !preset.error;
+      preset.job = null;
     }
+
+    // Make sure a preset is usable right now (blocks if it is still compiling). Returns false if broken.
+    ensure(preset) {
+      if (preset.program) return true;
+      if (preset.error) return false;
+      if (!preset.job) this.startPreset(preset);
+      this.finishPreset(preset);
+      return !!preset.program;
+    }
+
+    // Call once per frame: collect background compiles that have finished.
+    pump() {
+      const gl = this.gl;
+      for (const p of this.presets) {
+        if (p.program || p.error) continue;
+        if (this.parallel) {
+          if (p.job && gl.getProgramParameter(p.job.prog, this.parallel.COMPLETION_STATUS_KHR)) this.finishPreset(p);
+        } else {
+          this.ensure(p); // no background compiling available: one per frame
+          return;
+        }
+      }
+    }
+
+    get readyCount() { return this.presets.filter((p) => p.program).length; }
 
     texture(internal, w, h, filter, mip = false) {
       const gl = this.gl;
