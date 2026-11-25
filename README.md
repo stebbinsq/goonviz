@@ -61,7 +61,9 @@ shot like aerial photography, with clouds to fall through and thin white survey 
 contours and a subdividing grid. A = dive speed, D = film (natural, silver monochrome, infrared).
 **Brilliant** (no pad): a giant brilliant-cut diamond with real optics (57 exact facets, total internal
 reflection, dispersion splitting light into rainbow fire) over a black mirror floor, a sacred-geometry halo
-behind it. A = fire (quality), C = beat snap. They're the heaviest presets and are
+behind it. A = fire (quality), C = beat snap. **City** (no pad): Coastline's companion, an aerial flight over an
+endless city: towers downtown, a winding river with bridges, parks, window-lit facades and moving traffic.
+D = time of day (daylight, golden hour, night), C = data (survey lines and pulses down the streets), A = density. They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light

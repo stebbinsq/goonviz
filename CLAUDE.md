@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 35 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 36 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -35,6 +35,9 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 - 35 Brilliant (no pad): analytic ray vs 57-plane brilliant cut (hitGem), one internal TIR path at IOR 2.42
   split into nw wavelengths only where light exits (7x cheaper than per-wavelength paths, same look). env()
   inside the gem skips the fbm nebula. Exact geometry, so no noise and no marching.
+- 36 City (no pad): block-cell SDF (four lots per block, district() noise for downtown towers), river blocks
+  and parks; distance clamped at block edges. Windows fade to their average once smaller than a pixel (stops
+  night speckle). ~2x Honeycomb, like Brilliant; Coastline is ~2.5x.
 - Header flag "manual": true keeps a preset out of autopilot and random picks; App.frame cuts knob A by 20%
   whenever a manual preset's frame takes > 450 ms (a guard against the GPU watchdog). No preset uses it now
   (the path-traced Overkill was removed at the user's request: noisy and not good-looking).
