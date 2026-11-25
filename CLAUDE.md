@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 34 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 35 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -32,6 +32,9 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   (octave index = floor(gS) + k, so each octave keeps its own field as it slides; fades at both ends), zooming
   about the point the camera looks at (exponential zoom plus forward flight is a zoom about a point ahead).
   Search march uses coarse LOD, the hit is re-evaluated fine; shadows use only coarse octaves. ~2.5x Honeycomb.
+- 35 Overkill: spectral path tracer, header flag "manual": true (new; autopilot can-use and random_preset skip it).
+  Safety: spp capped to 3e6 / (uRes.x * uRes.y) in the shader, and App.frame cuts knob A by 20% whenever a manual
+  preset's frame takes > 450 ms. Measured on an M4 at 1440x900: ~105 ms at the default load, ~300-400 ms at max.
 - Earlier presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
   "Jade Cicada"-style organic visuals), 3D raymarched set (28–30, Tipper-inspired: rendered-looking fractal
   worlds with beat-snapped camera moves). 10 palettes.

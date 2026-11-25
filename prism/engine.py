@@ -92,6 +92,7 @@ class Preset:
         self.params = meta.get("params", {})
         self.labels = meta.get("labels", {})
         self.heavy = bool(meta.get("heavy", False))   # raymarched 3D/4D: too much for a Raspberry Pi
+        self.manual = bool(meta.get("manual", False))  # only by hand: autopilot and random picks skip it
         self.energy = meta.get("energy", 2)            # 1 calm .. 3 intense: autopilot matches it to the music
         self.family = meta.get("family", "organic")    # style family: autopilot varies it and picks routines by it
         self.stepped = stepped_knobs(self.source)

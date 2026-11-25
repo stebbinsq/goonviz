@@ -63,7 +63,7 @@
       // autopilot may only pick what works right now: no camera presets without a camera, nothing heavy on a Pi
       this.pilot.configure(this.presets, (i) => {
         const p = this.presets[i];
-        return !p.error && !(p.family === "video" && !this.engine.videoOn) && !(this.pi && p.heavy);
+        return !p.error && !p.manual && !(p.family === "video" && !this.engine.videoOn) && !(this.pi && p.heavy);
       });
       this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
       this.params.get("audio_sens").setValue(store.get("audioSens", 0.5), true);
@@ -169,7 +169,7 @@
       else if (action === "prev") this.selectPreset(this.presetIndex - 1);
       else if (action === "random_preset") {
         // on a Pi, random picks (and so autopilot) avoid the heavy 3D/4D presets; you can still pick them by hand
-        const pool = this.presets.map((p, i) => i).filter((i) => i !== this.presetIndex && !(this.pi && this.presets[i].heavy));
+        const pool = this.presets.map((p, i) => i).filter((i) => i !== this.presetIndex && !this.presets[i].manual && !(this.pi && this.presets[i].heavy));
         this.selectPreset(pool.length ? pool[Math.floor(Math.random() * pool.length)] : this.presetIndex);
       } else if (action === "randomize") { this.params.randomize(); this.picked.clear(); }
       else if (action === "reset") { this.params.loadPreset(this.preset.params); this.picked.clear(); }
@@ -523,6 +523,13 @@
       this.last = now;
       if (dt > 0) this.fps += (1 / dt - this.fps) * 0.05;
       if (dt > 0 && this.settings.quality === "auto") this.adaptResolution(dt, now);
+      // a manual-only monster (Overkill) may be pushed past what the GPU can take: if a frame takes too long,
+      // back its load knob off before the browser's GPU watchdog kills the page
+      if (this.preset.manual && dt * 1000 > 450) {
+        const load = this.params.get("a");
+        load.setValue(load.targetValue * 0.8, true);
+        this.notify(`load cut to ${Math.round(load.targetValue * 100)}% to keep the GPU alive`);
+      }
       const P = this.params, st = this.st;
 
       this.engine.pump();

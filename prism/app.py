@@ -173,7 +173,7 @@ class App:
         """Presets autopilot may switch to now: compiled, camera presets only with a camera running,
         and on a Pi (any ARM board) none of the heavy 3D/4D ones."""
         p = self.presets[i]
-        if not p.program or (self.low_power and p.heavy):
+        if not p.program or p.manual or (self.low_power and p.heavy):
             return False
         return p.family != "video" or bool(self.video and self.video.active)
 
@@ -219,7 +219,7 @@ class App:
             self.select_preset((self.preset_index - 1) % n)
         elif action == "random_preset":
             # on a Pi (any ARM board), random picks and so autopilot avoid the heavy 3D/4D presets
-            choices = [i for i in range(n) if i != self.preset_index
+            choices = [i for i in range(n) if i != self.preset_index and not self.presets[i].manual
                        and not (self.low_power and self.presets[i].heavy)] or [self.preset_index]
             self.select_preset(random.choice(choices))
         elif action == "randomize":
