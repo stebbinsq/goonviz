@@ -46,6 +46,20 @@
     padding: 10px 16px; border-radius: 10px; background: rgba(0,0,0,.72); border: 1px solid rgba(255,255,255,.12);
     font-size: clamp(14px, 1.5vw, 26px); opacity: 0; transition: opacity .35s; pointer-events: none; white-space: nowrap; }
   #osd.show { opacity: 1; transition: opacity .08s; }
+  /* the flash word: a huge caption slammed over the visuals, split like a bad VHS and glowing */
+  #word { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; pointer-events: none;
+    font: 900 120px/1 Impact, "Haettenschweiler", "Arial Narrow Bold", "Helvetica Neue", sans-serif;
+    letter-spacing: .02em; color: #fff; opacity: 0; white-space: nowrap; overflow: hidden;
+    text-shadow: -.035em 0 rgba(255, 0, 90, .95), .035em 0 rgba(0, 235, 255, .95), 0 0 .25em rgba(255, 255, 255, .7), 0 0 .6em rgba(255, 60, 200, .55); }
+  #word.hit { animation: wordHit .95s cubic-bezier(.2, .8, .2, 1) forwards; }
+  @keyframes wordHit {
+    0% { opacity: 1; transform: translateY(-50%) scale(1.45) skewX(-8deg); filter: blur(2px) brightness(2); }
+    12% { opacity: 1; transform: translateY(-50%) scale(1) skewX(0); filter: none; }
+    20% { transform: translateY(-50%) translateX(-.6%) scale(1.01); }
+    26% { transform: translateY(-50%) translateX(.6%) scale(1); }
+    65% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-50%) scale(.96); letter-spacing: .12em; }
+  }
   #osd .ctrl { font: 700 .8em ui-monospace, Menlo, monospace; color: #000; background: var(--gold); padding: 2px 8px; border-radius: 5px; }
   #osd .lbl { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
   #osd .val { color: var(--accent2); font-variant-numeric: tabular-nums; }
@@ -74,7 +88,7 @@
   h2:first-child { margin-top: 4px; }
   .field { display: grid; grid-template-columns: 74px 1fr; align-items: center; gap: 8px; margin-bottom: 6px; }
   .field > span { color: var(--dim); }
-  select { width: 100%; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; }
+  select, input[type=text] { width: 100%; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; }
   .status { color: var(--dim); font-size: 12px; margin: -2px 0 6px 82px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #meters { display: grid; grid-template-columns: auto 1fr auto 1fr auto 1fr auto; gap: 6px; align-items: center; font-size: 11px; color: var(--dim); }
   #meters b { height: 6px; background: var(--panel2); border-radius: 3px; overflow: hidden; }
@@ -152,6 +166,7 @@
       <div id="hud" hidden></div>
       <div id="toast"></div>
       <div id="osd"></div>
+      <div id="word">KETAMINE</div>
       <div class="intro">
         <button class="btn primary" id="start">Start GoonViz</button>
         <p id="introText">Chrome will ask to use your camera, microphone and MIDI devices. Allow all three for the full experience;
@@ -202,6 +217,8 @@
     <div class="field"><span>Indicator</span><label class="check"><input type="checkbox" id="osdToggle"> show what each control changes (also on the projector) · key <kbd>I</kbd></label></div>
 
     <h2>Settings</h2>
+    <div class="field"><span>Flash word</span><input id="wordInput" type="text" maxlength="24" spellcheck="false"
+      title="The word slammed on screen by the flash-word button (bank B switch S1, key K)"></div>
     <div class="field"><span>Quality</span>
       <select id="quality">
         <option value="auto">Auto (lighter on Intel graphics)</option>
@@ -227,12 +244,12 @@
 </div>
 
 <video id="cam" playsinline muted hidden></video>
-<script src="bundle.js?v=c50cc2f4ce"></script>
-<script src="js/params.js?v=c50cc2f4ce"></script>
-<script src="js/audio.js?v=c50cc2f4ce"></script>
-<script src="js/midi.js?v=c50cc2f4ce"></script>
-<script src="js/autopilot.js?v=c50cc2f4ce"></script>
-<script src="js/engine.js?v=c50cc2f4ce"></script>
-<script src="js/app.js?v=c50cc2f4ce"></script>
+<script src="bundle.js?v=e177a30cbb"></script>
+<script src="js/params.js?v=e177a30cbb"></script>
+<script src="js/audio.js?v=e177a30cbb"></script>
+<script src="js/midi.js?v=e177a30cbb"></script>
+<script src="js/autopilot.js?v=e177a30cbb"></script>
+<script src="js/engine.js?v=e177a30cbb"></script>
+<script src="js/app.js?v=e177a30cbb"></script>
 </body>
 </html>

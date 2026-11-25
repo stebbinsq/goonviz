@@ -30,7 +30,7 @@ DEFAULT_CONFIG = {
 TRANSITION_SECONDS = 1.2  # how long the old preset takes to melt into the new one
 
 ACTION_ITEMS = ["next", "prev", "random_preset", "randomize", "reset", "autopilot", "blackout",
-                "flash", "freeze", "shift", "tap", "video", "hud"] + [f"snapshot:{i}" for i in range(8)]
+                "flash", "freeze", "shift", "tap", "video", "hud", "word"] + [f"snapshot:{i}" for i in range(8)]
 
 
 def deep_merge(base, override):
@@ -245,6 +245,9 @@ class App:
             self.notify(f"video {'on' if self.video.active else 'off'}")
         elif action == "hud":
             self.show_hud = not self.show_hud
+        elif action == "word":
+            self.notify(self.cfg.get("flash_word", "KETAMINE"))   # the web app draws it big; here it's the HUD message
+            self.state["flash"] = max(self.state["flash"], 0.35)
         elif action.startswith("preset:"):
             self.select_preset(int(action.split(":")[1]) % n)
         elif action.startswith("snapshot:"):

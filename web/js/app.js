@@ -23,7 +23,7 @@
   const ACTION_LABELS = {
     next: "Next ▶", prev: "◀ Prev", random_preset: "Random preset", randomize: "Randomize FX",
     reset: "Reset knobs", autopilot: "Autopilot", blackout: "Blackout", flash: "Flash", freeze: "Freeze",
-    shift: "Shift", tap: "Tap beat", video: "Camera on/off", hud: "Overlay",
+    shift: "Shift", tap: "Tap beat", video: "Camera on/off", hud: "Overlay", word: "Flash word",
   };
   const STATE_ACTIONS = new Set(D.stateActions);
 
@@ -58,7 +58,7 @@
       this.mapName = store.get("mapName", "akai_mpd32");
       this.loadMap();
       this.snapshots = store.get("snapshots", {});
-      this.settings = Object.assign({ quality: "auto", pickup: false, osd: true }, store.get("settings", {}));
+      this.settings = Object.assign({ quality: "auto", pickup: false, osd: true, word: "KETAMINE" }, store.get("settings", {}));
       this.pilot = new Prism.Autopilot(this.params, D.kaleidoChaos, D.palettes.length);
       // autopilot may only pick what works right now: no camera presets without a camera, nothing heavy on a Pi
       this.pilot.configure(this.presets, (i) => {
@@ -164,6 +164,7 @@
       if (action === "shift") this.shift = pressed;
       else if (action === "flash") this.flashHeld = pressed;
       if (!pressed) return this.refreshChrome();
+      if (action === "word") return this.flashWord();
       const n = this.presets.length;
       if (action === "next") this.selectPreset(this.presetIndex + 1);
       else if (action === "prev") this.selectPreset(this.presetIndex - 1);
@@ -213,6 +214,8 @@
         if (target === "audio_sens") store.set("audioSens", p.targetValue);
         return;
       }
+      // the flash word fires on every hit, even from a latching switch (which alternates on/off messages)
+      if (target === "word") { if (pressed || source !== "note") this.doAction("word", true); return; }
       const latching = source === "cc" || source === "toggle_pad";
       if (STATE_ACTIONS.has(target) && latching) this.setState(target, pressed);
       else if (source === "toggle_pad") {
@@ -278,6 +281,19 @@
     }
 
     // Show "<control> <what> <value>" over the visuals for a moment. Only user input calls this.
+    // slam the flash word over the visuals (restarting the animation on every hit)
+    flashWord() {
+      const el = $("#word");
+      el.textContent = this.settings.word || "KETAMINE";
+      // fit the stage (or the projector screen in fullscreen), whatever the word: Impact caps are ~0.55em wide
+      const w = $("#stage").clientWidth;
+      el.style.fontSize = `${Math.min(w * 0.17, (w * 0.86) / (Math.max(1, el.textContent.length) * 0.56))}px`;
+      el.classList.remove("hit");
+      void el.offsetWidth;                                   // reflow, so the animation restarts
+      el.classList.add("hit");
+      this.st.flash = Math.max(this.st.flash, 0.35);
+    }
+
     indicate(ctrl, target) {
       if (!this.settings.osd) return;
       const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
@@ -318,7 +334,7 @@
     // ---- keyboard -------------------------------------------------------
 
     bindKeys() {
-      const keymap = { r: "randomize", p: "random_preset", Backspace: "reset", a: "autopilot", b: "blackout",
+      const keymap = { r: "randomize", p: "random_preset", Backspace: "reset", a: "autopilot", b: "blackout", k: "word",
                        z: "freeze", t: "tap", v: "video", h: "hud", ArrowRight: "next", ArrowLeft: "prev" };
       window.addEventListener("keydown", (e) => {
         if (e.target.closest("input, select, textarea")) return;
@@ -694,6 +710,8 @@
       $("#osdToggle").checked = this.settings.osd;
       $("#osdToggle").onchange = (e) => { this.settings.osd = e.target.checked; store.set("settings", this.settings); if (!this.settings.osd) $("#osd").classList.remove("show"); };
       $("#pickup").onchange = (e) => { this.settings.pickup = e.target.checked; store.set("settings", this.settings); };
+      $("#wordInput").value = this.settings.word;
+      $("#wordInput").oninput = (e) => { this.settings.word = e.target.value.trim() || "KETAMINE"; store.set("settings", this.settings); };
 
       // MIDI map
       const mapSel = $("#mapSel");

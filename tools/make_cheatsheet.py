@@ -36,7 +36,7 @@ PARAM_INFO = {
 }
 ACTION_INFO = {
     "next": "Next ▶", "prev": "◀ Prev", "random_preset": "Random preset", "randomize": "Randomize FX",
-    "reset": "Reset knobs", "autopilot": "Autopilot", "blackout": "BLACKOUT", "flash": "Flash",
+    "reset": "Reset knobs", "autopilot": "Autopilot", "blackout": "BLACKOUT", "flash": "Flash", "word": "KETAMINE",
     "freeze": "Freeze", "shift": "SHIFT", "tap": "Tap beat", "video": "Camera on/off", "hud": "Overlay",
 }
 HOT = {"blackout", "brightness", "shift"}

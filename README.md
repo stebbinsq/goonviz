@@ -190,6 +190,8 @@ The main layout:
 - **Control bank B:** warp, chroma, saturation, contrast, audio react…, the 360 view and spin (faders F5, F6), and
   **autopilot intensity** (fader F7), **mic sensitivity** (fader F8).
 - **Transport:** ◀◀ / ▶▶ prev/next, ■ blackout, ▶ autopilot, ● randomize.
+- **Flash word:** bank B switch S1 (or key **K**, or the panel button) slams a word over the visuals, KETAMINE by
+  default; change it under Settings → Flash word.
 
 If you switch the MPD32 to a different preset, the numbers change. Re-map with MIDI learn (the **L** buttons), or
 on the Pi run `.venv/bin/python run.py --learn-pads` and hit the pads in order.
