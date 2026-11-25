@@ -58,12 +58,7 @@ and aluminium routing layers, memory arrays and spiral inductors under rainbow o
 data pulses racing along the traces (C) on the beat. A = magnification, D = oxide colour. **Coastline** (no pad:
 use next/prev, the panel or autopilot), after Max Cooper's science-art: an endless dive toward a fractal coastline
 shot like aerial photography, with clouds to fall through and thin white survey lines (C) tracing the shore,
-contours and a subdividing grid. A = dive speed, D = film (natural, silver monochrome, infrared).
-**Overkill** (manual only: autopilot and random picks never choose it) is a benchmark monster: a spectral Monte
-Carlo path tracer of a glass gyroid sculpture with dispersion, fog god rays and depth of field. Knob A is LOAD
-(samples per pixel and bounces); at the top it renders a couple of frames a second on an Apple-silicon Mac. A
-frame is capped at about 3 million pixel-samples, and if a frame still takes over 0.45 s the app backs the load
-off itself, so it can't trip the browser's GPU watchdog. They're the heaviest presets and are
+contours and a subdividing grid. A = dive speed, D = film (natural, silver monochrome, infrared). They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light
