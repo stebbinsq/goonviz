@@ -55,8 +55,11 @@ portals, each chamber holding a morphing jewel of nested glowing polyhedra that 
 glass-like arches and light waves running through the veins. Knob A morphs it from organic tubes to fine lace,
 C sets the reflections. **Silicon** (pad C16): a photorealistic macro flight over a microchip die, with copper
 and aluminium routing layers, memory arrays and spiral inductors under rainbow oxide, shallow depth of field, and
-data pulses racing along the traces (C) on the beat. A = magnification, D = oxide colour. They're the heaviest
-presets and are
+data pulses racing along the traces (C) on the beat. A = magnification, D = oxide colour. **Coastline** (no pad:
+use next/prev, the panel or autopilot), after Max Cooper's science-art: an endless dive toward a fractal coastline
+shot like aerial photography, with clouds to fall through and thin white survey lines (C) tracing the shore,
+contours and a subdividing grid. A = dive speed, D = film (natural, silver monochrome, infrared). They're the
+heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light

@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 33 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 34 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -28,6 +28,10 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   layer a lane-and-cell grid with distance clamps at lane, cell and block edges (keeps the SDF a lower bound).
   Thin-film colour from oxide thickness; physical metal F0s (palette only for data pulses). Rays stop at the
   depth-of-field limit (focus * 3.5) and use dieBlur() beyond it, which roughly halves the cost.
+- 34 Coastline (no pad; the MPD32's preset pads are all used): infinite zoom by sliding a 12-octave noise stack
+  (octave index = floor(gS) + k, so each octave keeps its own field as it slides; fades at both ends), zooming
+  about the point the camera looks at (exponential zoom plus forward flight is a zoom about a point ahead).
+  Search march uses coarse LOD, the hit is re-evaluated fine; shadows use only coarse octaves. ~2.5x Honeycomb.
 - Earlier presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
   "Jade Cicada"-style organic visuals), 3D raymarched set (28–30, Tipper-inspired: rendered-looking fractal
   worlds with beat-snapped camera moves). 10 palettes.
@@ -63,6 +67,9 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   123203145+stebbinsq@users.noreply.github.com), Pages custom domain, and DNS at name.com (the user does that).
 
 ## Pi status (as of 2026-10-29)
+
+- **2026-11-24: the user no longer cares about running on the Pi.** New presets target Mac/phone GPUs only;
+  keep the existing Pi code working but don't spend effort on Pi cost or the GLSL 1.40 dialect.
 
 - Code is done and tested on the Mac: headless renders, GLSL 1.40 (the Pi's dialect), simulated MIDI.
   **Not yet run on real hardware.** The user doesn't have the Pi or SD card yet.
