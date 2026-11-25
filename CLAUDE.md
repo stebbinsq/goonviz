@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 32 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 33 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -24,6 +24,10 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   mirror). The camera path and relic positions (AXIS 0.808, chamber length 2.334) were found numerically for
   clearance (>= 0.19 everywhere, for any morph); changing CS breaks them. Morph = inversion size 0.68..1.08 (above
   ~1.1 it turns to noise). Costs about the same as Honeycomb (~8.7 ms at 720p on an M4).
+- 33 Meme Odyssey (pad C16): five worlds, ZT = 20 s each (of uTime), portal over the last TR = 2.6 s; only
+  portal-rim pixels render two worlds. Worlds are separate functions picked by a uniform-coherent branch. Original
+  takes on meme ideas (no copyrighted characters); it keeps meme colours (an intended exception to pal()-only).
+  Each world costs under Honeycomb.
 - Earlier presets: originals (1–17), kaleidoscopic set (18–23), Jade set (24–27, inspired by the user's request for
   "Jade Cicada"-style organic visuals), 3D raymarched set (28–30, Tipper-inspired: rendered-looking fractal
   worlds with beat-snapped camera moves). 10 palettes.

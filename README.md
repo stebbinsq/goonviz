@@ -53,7 +53,9 @@ a flight through the {4,3,5} honeycomb (cubes, five around every edge) in the Po
 **Kleinian Reliquary** (pad C15), the most complex: a flight through a pseudo-Kleinian fractal's halls of nested
 portals, each chamber holding a morphing jewel of nested glowing polyhedra that lights the walls, with reflections,
 glass-like arches and light waves running through the veins. Knob A morphs it from organic tubes to fine lace,
-C sets the reflections. They're the heaviest presets and are
+C sets the reflections. **Meme Odyssey** (pad C16): a 100-second journey through five meme worlds, each flying
+into the next through a portal: Vaporwave, a Moai avenue with laser eyes, Illuminati Confirmed, Galaxy Brain and
+Stonks. A = chaos (beat punch-ins), C = deep fry. They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light

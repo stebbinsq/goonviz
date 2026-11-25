@@ -226,7 +226,8 @@
     "3:63": "preset:28",
     "3:64": "preset:29",
     "3:65": "preset:30",
-    "3:66": "preset:31"
+    "3:66": "preset:31",
+    "3:67": "preset:32"
   },
   "mmc": {},
   "pad_mode": "momentary",
