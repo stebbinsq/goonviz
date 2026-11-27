@@ -76,6 +76,10 @@ green zones spread until the whole sea glows green). On the keyboard, hold ← �
 **Disco Booty** (no pad): a giant mirror-ball booty twerking on a light-up dance floor. The hips pop on every
 beat, each cheek bounces on its own spring (the leading cheek alternates), with a squeeze every fourth beat.
 A = jiggle, B = twerk, C = camera angle, D = material (mirror tiles, liquid chrome, gold glitter, holographic).
+**Afters Highway** (no pad): 6 a.m., driving to the afters down an endless motorway. Overhead signs say what
+everyone's thinking ("SOBRIETY ← CLOSED", "SPEED LIMIT 174 BPM", "LAST TRAIN HOME: MISSED"), LED billboards on
+the hills, trucks hauling glowsticks that swerve out of your lane, a speedometer in BPM. You drive: K2 (B) or
+holding ← → changes lanes, K1 (A) = throttle, K3 (C) = chase camera, K4 (D) = sunrise.
 They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
@@ -303,7 +307,7 @@ Prefix a channel to restrict it: `"10:36"`. Program Change messages select prese
 
 | key | | key | |
 |---|---|---|---|
-| ← → | prev / next preset (steer in Wasteland; ↑ ↓ climb) | 1–0 | presets 1–10 |
+| ← → | prev / next preset (steer in Wasteland, change lanes in Afters Highway; ↑ ↓ climb) | 1–0 | presets 1–10 |
 | ↑ ↓ | select knob/action | `-` `=` | adjust (shift = coarse) |
 | Enter | trigger selected action | L | MIDI learn |
 | F1–F8 | recall snapshot (shift = save) | R / P | randomize FX / random preset |

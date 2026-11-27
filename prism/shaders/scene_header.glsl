@@ -23,7 +23,10 @@ uniform sampler2D uVideo; // live video input (channel order set by VIDEO_SWIZZL
 uniform sampler2D uFFT;   // 128-bin log spectrum in .r
 uniform vec3 uPal[5];     // current palette (5 colour stops, cyclic, darkest first)
 uniform vec4 uShip;       // presets with "ship": true: the app flies a ship: x, z, heading (radians), steer (-1..1)
-uniform float uShipAlt;   // its altitude setting 0..1 (knob C plus the up/down arrow keys)
+uniform vec4 uShip2;      // and: strafe -1..1 (knob B, nudged by holding the arrow keys), altitude 0..1 (knob C,
+                          // nudged by the up/down arrows), distance travelled, throttle 0..1 (knob A)
+uniform vec4 uMusic;      // slow loudness (~12 s average), drop (1 when one is detected, fading over ~8 s),
+                          // seconds since that drop (999 before the first), drops so far
 
 in vec2 vUV;
 out vec4 fragColor;

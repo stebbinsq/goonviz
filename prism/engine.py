@@ -283,7 +283,10 @@ class Engine:
         s(prog, "uCamYaw", state.get("cam_yaw", 0.0))
         ship = state.get("ship", {})
         s(prog, "uShip", (ship.get("x", 0.0), ship.get("z", 0.0), ship.get("yaw", 0.0), ship.get("steer", 0.0)))
-        s(prog, "uShipAlt", ship.get("alt", 0.4))
+        s(prog, "uShip2", (ship.get("strafe", 0.0), ship.get("alt", 0.4), ship.get("dist", 0.0), P.v("a")))
+        music = state.get("music", {})
+        s(prog, "uMusic", (music.get("slow", 0.3), music.get("drop", 0.0), min(999.0, music.get("since", 999.0)),
+                           float(music.get("count", 0))))
         s(prog, "uPrev", 0)
         s(prog, "uVideo", 1)
         s(prog, "uFFT", 2)

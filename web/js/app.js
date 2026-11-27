@@ -73,7 +73,9 @@
       this.params.get("audio_sens").setValue(store.get("audioSens", 0.5), true);
 
       this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0, transition: 0,
-                  ship: { x: 0, z: 0, yaw: 0, steer: 0, alt: 0.4, altKey: 0 } };
+                  ship: { x: 0, z: 0, yaw: 0, steer: 0, alt: 0.4, altKey: 0, strafe: 0, strafeKey: 0, dist: 0 },
+                  music: { fast: 0.3, slow: 0.3, prev: 0.3, drop: 0, since: 999, count: 0, cooldown: 0, quiet: true } };
+      this.musicBeat = 0;
       this.shipKeys = {};   // arrow keys held while flying a ship preset
       this.shift = this.frozen = this.flashHeld = false;
       this.blackoutTarget = 0;
@@ -584,6 +586,7 @@
         st.pulse += dp;
         if (this.preset.ship) this.flyShip(dt, dp);
       }
+      this.trackMusic(dt);
       st.realTime = now / 1000;
       st.camYaw = (st.camYaw + dt * P.v("cam_spin") * 0.6) % (Math.PI * 2);
       st.flash = this.flashHeld ? 1 : st.flash * Math.exp(-dt * 10);
@@ -610,9 +613,32 @@
       // keep the world coordinates small enough for float32 noise in the shader (the terrain has no period, so
       // this just teleports to fresh ground far away, which nobody can see while it's this far off)
       if (Math.abs(sh.x) > 20000 || Math.abs(sh.z) > 20000) { sh.x = 0; sh.z = 0; }
+      sh.dist += fwd;
       sh.altKey = Math.max(-1, Math.min(1, sh.altKey + keyClimb * dt * 0.6));
       const altIn = Math.max(0, Math.min(1, P.v("c") + sh.altKey));
       sh.alt += (altIn - sh.alt) * (1 - Math.exp(-dt * 2));
+      // strafe (for presets that slide sideways instead of turning): knob B sets it, held arrows nudge it
+      sh.strafeKey = Math.max(-2, Math.min(2, sh.strafeKey + keySteer * dt * 1.4));
+      const strafeIn = Math.max(-1, Math.min(1, (P.v("b") - 0.5) * 2 + sh.strafeKey));
+      sh.strafe += (strafeIn - sh.strafe) * (1 - Math.exp(-dt * 6));
+    }
+
+    // music energy for presets (uMusic), whether or not autopilot is on: a slow loudness average and a
+    // drop detector (loud now after a quieter stretch), like the autopilot's
+    trackMusic(dt) {
+      const m = this.st.music, lvl = this.audio.level;
+      const beats = this.audio.beatCount - this.musicBeat;
+      this.musicBeat = this.audio.beatCount;
+      m.fast += (lvl - m.fast) * (1 - Math.exp(-dt / 1.0));
+      m.slow += (lvl - m.slow) * (1 - Math.exp(-dt / 12.0));
+      m.prev += (m.slow - m.prev) * (1 - Math.exp(-dt / 4.0));
+      m.cooldown = Math.max(0, m.cooldown - dt);
+      if (m.fast < m.slow * 0.55) m.quiet = true;
+      if (m.cooldown === 0 && beats > 0 && (m.quiet || m.prev < m.slow * 0.85) && m.fast > Math.max(0.5, m.slow * 1.45)) {
+        m.drop = 1; m.since = 0; m.count += 1; m.cooldown = 8; m.quiet = false;
+      }
+      m.drop *= Math.exp(-dt / 3.0);
+      m.since += dt;
     }
 
     tickAutopilot(dt) {

@@ -168,7 +168,7 @@ vec3 scene(vec2 p, vec2 uv) {
     vec2 f2 = vec2(sin(yaw), cos(yaw));
     // altitude: the setting, but always clear of the ground under and ahead of the ship
     float clear = max(max(ground(S, 1.0), ground(S + f2 * 1.2, 1.0)), max(ground(S + f2 * 2.4, 1.0), ground(S - f2 * 0.8, 1.0)));
-    float shipY = max(LAVA + 0.22 + uShipAlt * 2.3, clear + 0.32) + 0.015 * sin(uRealTime * 2.1);
+    float shipY = max(LAVA + 0.22 + uShip2.y * 2.3, clear + 0.32) + 0.015 * sin(uRealTime * 2.1);
     vec3 SP = vec3(S.x, shipY, S.y);
     float roll = steer * 0.6 + 0.03 * sin(uRealTime * 1.3);      // bank into the turn
 

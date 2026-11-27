@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 40 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 41 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -54,6 +54,13 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   per pixel. Time since the last beat is recovered from uBeat (it decays as exp(-7t)), which drives each
   cheek's damped spring. Reflections use envAt() (club lamps + the light-up floor); only the materials the
   D knob selects are evaluated. Cheaper than Honeycomb.
+- 41 Afters Highway (no pad): road-space SDF (u across, v along; our carriageway is u < 0 = screen right),
+  traffic lanes with cheap lateral bounds (lane()), text on gantry signs/billboards/truck doors. Text in
+  shaders: tools/glsl_text.py bakes the strings of a preset's `// @text {...}` line into a 5x7 pixel font
+  between `// <text>` markers (drawText / drawNum / textLen); rerun it after editing that line.
+- Ship API: uShip (x, z, heading, steer) and uShip2 (strafe -1..1 from B + held arrows, altitude, distance,
+  throttle). uMusic (slow energy, drop pulse, seconds since the drop, drop count) comes from App.trackMusic /
+  native track_music, independent of autopilot.
 - Header flag "manual": true keeps a preset out of autopilot and random picks; App.frame cuts knob A by 20%
   whenever a manual preset's frame takes > 450 ms (a guard against the GPU watchdog). No preset uses it now
   (the path-traced Overkill was removed at the user's request: noisy and not good-looking).

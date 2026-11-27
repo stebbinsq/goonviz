@@ -141,7 +141,10 @@ class App:
         self.message, self.message_until = "", 0.0
         self.state = {"time": 0.0, "pulse": 0.0, "real_time": 0.0, "flash": 0.0, "blackout": 0.0,
                       "cam_yaw": 0.0, "transition": 0.0,
-                      "ship": {"x": 0.0, "z": 0.0, "yaw": 0.0, "steer": 0.0, "alt": 0.4}}
+                      "ship": {"x": 0.0, "z": 0.0, "yaw": 0.0, "steer": 0.0, "alt": 0.4, "strafe": 0.0, "dist": 0.0},
+                      "music": {"fast": 0.3, "slow": 0.3, "prev": 0.3, "drop": 0.0, "since": 999.0, "count": 0,
+                                "cooldown": 0.0, "quiet": True}}
+        self.music_beat = 0
         self.fps = 0.0
         self.last_reload_check = 0.0
         self.last_beat_count = 0
@@ -394,7 +397,26 @@ class App:
         sh["z"] += math.cos(sh["yaw"]) * fwd
         if abs(sh["x"]) > 20000 or abs(sh["z"]) > 20000:
             sh["x"] = sh["z"] = 0.0
+        sh["dist"] += fwd
         sh["alt"] += (P.v("c") - sh["alt"]) * (1.0 - math.exp(-dt * 2.0))
+        sh["strafe"] += ((P.v("b") - 0.5) * 2.0 - sh["strafe"]) * (1.0 - math.exp(-dt * 6.0))
+
+    def track_music(self, dt):
+        """Music energy for presets (uMusic): slow loudness and a drop detector, like the web app's trackMusic."""
+        m, lvl = self.state["music"], self.audio.level
+        beats = self.audio.beat_count - self.music_beat
+        self.music_beat = self.audio.beat_count
+        m["fast"] += (lvl - m["fast"]) * (1.0 - math.exp(-dt / 1.0))
+        m["slow"] += (lvl - m["slow"]) * (1.0 - math.exp(-dt / 12.0))
+        m["prev"] += (m["slow"] - m["prev"]) * (1.0 - math.exp(-dt / 4.0))
+        m["cooldown"] = max(0.0, m["cooldown"] - dt)
+        if m["fast"] < m["slow"] * 0.55:
+            m["quiet"] = True
+        if (m["cooldown"] == 0.0 and beats > 0 and (m["quiet"] or m["prev"] < m["slow"] * 0.85)
+                and m["fast"] > max(0.5, m["slow"] * 1.45)):
+            m.update(drop=1.0, since=0.0, count=m["count"] + 1, cooldown=8.0, quiet=False)
+        m["drop"] *= math.exp(-dt / 3.0)
+        m["since"] += dt
 
     def tick_autopilot(self, dt):
         beats = self.audio.beat_count - self.last_beat_count
@@ -477,6 +499,7 @@ class App:
                 st["pulse"] += dp
                 if self.preset.ship:
                     self.fly_ship(dt, dp)
+            self.track_music(dt)
             st["real_time"] = now - start
             st["cam_yaw"] = (st["cam_yaw"] + dt * P.v("cam_spin") * 0.6) % (2.0 * math.pi)
             st["flash"] = 1.0 if self.flash_held else st["flash"] * math.exp(-dt * 10.0)
