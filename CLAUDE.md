@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 38 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 39 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -44,6 +44,12 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   confusion) with energy spread over the disc; the glow is a separate smooth 28/56-step march. Bokeh dust is a
   coarse DDA measured in screen space (round discs, no wide-angle stretch). Name vnoise, not noise3 (a GLSL
   builtin). Stardust ~ Honeycomb cost, Vortex ~1.4x (CS 0.013, up to 420 voxels).
+- 39 Wasteland (no pad; user asked for "driving a ship through a nuclear lava wasteland"): header "ship": true
+  makes the app integrate a ship (App.flyShip / native fly_ship): uShip = (x, z, heading, steer), uShipAlt.
+  B steers (centre straight), A throttle (distance follows the pulse clock, so bass surges), C altitude; in
+  ship presets the arrow keys steer/climb instead of prev/next. Heading convention: steer > 0 decreases yaw
+  (forward = (sin yaw, cos yaw) turns toward -x, which is screen right). The shader keeps the ship above
+  the ground ahead; ship roll and camera roll have opposite sign conventions (see comments). ~1.6x Honeycomb.
 - Header flag "manual": true keeps a preset out of autopilot and random picks; App.frame cuts knob A by 20%
   whenever a manual preset's frame takes > 450 ms (a guard against the GPU watchdog). No preset uses it now
   (the path-traced Overkill was removed at the user's request: noisy and not good-looking).

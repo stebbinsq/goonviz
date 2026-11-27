@@ -25,7 +25,7 @@
   const ACTION_LABELS = {
     next: "Next ▶", prev: "◀ Prev", random_preset: "Random preset", randomize: "Randomize FX",
     reset: "Reset knobs", autopilot: "Autopilot", blackout: "Blackout", flash: "Flash", freeze: "Freeze",
-    shift: "Shift", tap: "Tap beat", video: "Camera on/off", hud: "Overlay", word: "Flash word",
+    shift: "Shift", tap: "Tap beat", video: "Camera on/off", hud: "Overlay", word: "Flash word", ship: "Steer the ship",
   };
   const STATE_ACTIONS = new Set(D.stateActions);
 
@@ -72,7 +72,9 @@
       this.params.get("ap_intensity").setValue(store.get("apIntensity", 0.5), true);
       this.params.get("audio_sens").setValue(store.get("audioSens", 0.5), true);
 
-      this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0, transition: 0 };
+      this.st = { time: 0, pulse: 0, realTime: 0, flash: 0, blackout: 0, camYaw: 0, transition: 0,
+                  ship: { x: 0, z: 0, yaw: 0, steer: 0, alt: 0.4, altKey: 0 } };
+      this.shipKeys = {};   // arrow keys held while flying a ship preset
       this.shift = this.frozen = this.flashHeld = false;
       this.blackoutTarget = 0;
       this.videoActive = true;
@@ -348,9 +350,16 @@
     bindKeys() {
       const keymap = { r: "randomize", p: "random_preset", Backspace: "reset", a: "autopilot", b: "blackout", k: "word",
                        z: "freeze", t: "tap", v: "video", h: "hud", ArrowRight: "next", ArrowLeft: "prev" };
+      const arrows = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
       window.addEventListener("keydown", (e) => {
         if (e.target.closest("input, select, textarea")) return;
         if (e.metaKey || e.ctrlKey || e.altKey) return;
+        // flying a ship: the arrow keys steer and climb (hold them) instead of changing presets
+        if (this.preset && this.preset.ship && arrows.includes(e.key)) {
+          e.preventDefault();
+          if (!e.repeat) { this.shipKeys[e.key] = true; this.indicate(`Key ${{ ArrowLeft: "←", ArrowRight: "→", ArrowUp: "↑", ArrowDown: "↓" }[e.key]}`, "ship"); }
+          return;
+        }
         if (e.key === " ") { e.preventDefault(); if (!e.repeat) this.doAction("flash", true); return; }
         if (e.repeat) return;
         if (e.key === "Escape" && this.learning) { this.learning = null; this.refreshLearn(); return; }
@@ -370,7 +379,8 @@
           this.indicate(`Key ${keyName}`, action);
         }
       });
-      window.addEventListener("keyup", (e) => { if (e.key === " ") this.doAction("flash", false); });
+      window.addEventListener("keyup", (e) => { if (e.key === " ") this.doAction("flash", false); this.shipKeys[e.key] = false; });
+      window.addEventListener("blur", () => { this.shipKeys = {}; });
     }
 
     // ---- devices ----------------------------------------------------------
@@ -570,7 +580,9 @@
 
       if (!this.frozen) {
         st.time += dt * P.v("speed");
-        st.pulse += dt * P.v("speed") * (1 + this.audio.bass * P.v("react") * 1.5);
+        const dp = dt * P.v("speed") * (1 + this.audio.bass * P.v("react") * 1.5);
+        st.pulse += dp;
+        if (this.preset.ship) this.flyShip(dt, dp);
       }
       st.realTime = now / 1000;
       st.camYaw = (st.camYaw + dt * P.v("cam_spin") * 0.6) % (Math.PI * 2);
@@ -581,6 +593,26 @@
       this.engine.render(this.preset, P, st, this.audio);
       if ((this._uiTick = (this._uiTick || 0) + 1) % 6 === 0) this.refreshLive();
       requestAnimationFrame((t) => this.frame(t));
+    }
+
+    // ship presets: knob A = throttle, B = steer (centre = straight), C = altitude; the arrow keys steer and climb.
+    // The ship surges forward on bass hits like everything else (it moves by the pulse clock).
+    flyShip(dt, dp) {
+      const sh = this.st.ship, P = this.params, k = this.shipKeys;
+      const keySteer = (k.ArrowRight ? 1 : 0) - (k.ArrowLeft ? 1 : 0);
+      const keyClimb = (k.ArrowUp ? 1 : 0) - (k.ArrowDown ? 1 : 0);
+      const steerIn = Math.max(-1, Math.min(1, (P.v("b") - 0.5) * 2 + keySteer));
+      sh.steer += (steerIn - sh.steer) * (1 - Math.exp(-dt * 3));
+      sh.yaw = (sh.yaw - sh.steer * 0.75 * dt) % (Math.PI * 2);   // right (steer > 0) turns toward -x, screen right
+      const fwd = dp * (0.4 + P.v("a") * 2.6);
+      sh.x += Math.sin(sh.yaw) * fwd;
+      sh.z += Math.cos(sh.yaw) * fwd;
+      // keep the world coordinates small enough for float32 noise in the shader (the terrain has no period, so
+      // this just teleports to fresh ground far away, which nobody can see while it's this far off)
+      if (Math.abs(sh.x) > 20000 || Math.abs(sh.z) > 20000) { sh.x = 0; sh.z = 0; }
+      sh.altKey = Math.max(-1, Math.min(1, sh.altKey + keyClimb * dt * 0.6));
+      const altIn = Math.max(0, Math.min(1, P.v("c") + sh.altKey));
+      sh.alt += (altIn - sh.alt) * (1 - Math.exp(-dt * 2));
     }
 
     tickAutopilot(dt) {

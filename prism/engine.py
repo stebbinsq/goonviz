@@ -93,6 +93,7 @@ class Preset:
         self.labels = meta.get("labels", {})
         self.heavy = bool(meta.get("heavy", False))   # raymarched 3D/4D: too much for a Raspberry Pi
         self.manual = bool(meta.get("manual", False))  # only by hand: autopilot and random picks skip it
+        self.ship = bool(meta.get("ship", False))      # the app flies a ship for it (uShip): A throttle, B steer, C altitude
         self.energy = meta.get("energy", 2)            # 1 calm .. 3 intense: autopilot matches it to the music
         self.family = meta.get("family", "organic")    # style family: autopilot varies it and picks routines by it
         self.stepped = stepped_knobs(self.source)
@@ -280,6 +281,9 @@ class Engine:
         s(prog, "uVideo360", 1.0 if self.video_360 else 0.0)
         s(prog, "uCamView", P.v("cam_view"))
         s(prog, "uCamYaw", state.get("cam_yaw", 0.0))
+        ship = state.get("ship", {})
+        s(prog, "uShip", (ship.get("x", 0.0), ship.get("z", 0.0), ship.get("yaw", 0.0), ship.get("steer", 0.0)))
+        s(prog, "uShipAlt", ship.get("alt", 0.4))
         s(prog, "uPrev", 0)
         s(prog, "uVideo", 1)
         s(prog, "uFFT", 2)

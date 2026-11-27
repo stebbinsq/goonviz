@@ -67,7 +67,12 @@ D = time of day (daylight, golden hour, night), C = data (survey lines and pulse
 **Stardust** and **Vortex** (no pads): real particles filmed through a lens. Stardust is a drifting cloud of
 blue-white filaments and gold specks with out-of-focus dust floating past as bokeh; Vortex is a whirlpool of
 ring strands that twist up into a spout, clumps streaming around faster near the middle. A = particle count,
-B = palette tint, C = turbulence / twist, D = depth of field. They're the heaviest presets and are
+B = palette tint, C = turbulence / twist, D = depth of field.
+**Wasteland** (no pad): you fly a ship, chase-cam, over a nuclear lava wasteland: a sea of lava under cracked
+black crust, basalt ridges lit from below, embers streaming past, volcanic lightning on the beat. It really
+steers: K1 (A) = throttle, K2 (B) = steer (centre = straight ahead), K3 (C) = altitude, K4 (D) = radiation (toxic
+green zones spread until the whole sea glows green). On the keyboard, hold ← → to steer and ↑ ↓ to climb or dive
+(in this preset only; the arrows change presets everywhere else). They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light
@@ -294,7 +299,7 @@ Prefix a channel to restrict it: `"10:36"`. Program Change messages select prese
 
 | key | | key | |
 |---|---|---|---|
-| ← → | prev / next preset | 1–0 | presets 1–10 |
+| ← → | prev / next preset (steer in Wasteland; ↑ ↓ climb) | 1–0 | presets 1–10 |
 | ↑ ↓ | select knob/action | `-` `=` | adjust (shift = coarse) |
 | Enter | trigger selected action | L | MIDI learn |
 | F1–F8 | recall snapshot (shift = save) | R / P | randomize FX / random preset |

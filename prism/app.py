@@ -140,7 +140,8 @@ class App:
         self.flash_held = False
         self.message, self.message_until = "", 0.0
         self.state = {"time": 0.0, "pulse": 0.0, "real_time": 0.0, "flash": 0.0, "blackout": 0.0,
-                      "cam_yaw": 0.0, "transition": 0.0}
+                      "cam_yaw": 0.0, "transition": 0.0,
+                      "ship": {"x": 0.0, "z": 0.0, "yaw": 0.0, "steer": 0.0, "alt": 0.4}}
         self.fps = 0.0
         self.last_reload_check = 0.0
         self.last_beat_count = 0
@@ -382,6 +383,19 @@ class App:
 
     # ---- per-frame -----------------------------------------------------
 
+    def fly_ship(self, dt, dp):
+        """Ship presets: knob A = throttle, B = steer (centre = straight), C = altitude. Same as the web app's flyShip."""
+        sh, P = self.state["ship"], self.params
+        steer_in = max(-1.0, min(1.0, (P.v("b") - 0.5) * 2.0))
+        sh["steer"] += (steer_in - sh["steer"]) * (1.0 - math.exp(-dt * 3.0))
+        sh["yaw"] = (sh["yaw"] - sh["steer"] * 0.75 * dt) % (2.0 * math.pi)  # right (steer > 0) turns toward -x, screen right
+        fwd = dp * (0.4 + P.v("a") * 2.6)
+        sh["x"] += math.sin(sh["yaw"]) * fwd
+        sh["z"] += math.cos(sh["yaw"]) * fwd
+        if abs(sh["x"]) > 20000 or abs(sh["z"]) > 20000:
+            sh["x"] = sh["z"] = 0.0
+        sh["alt"] += (P.v("c") - sh["alt"]) * (1.0 - math.exp(-dt * 2.0))
+
     def tick_autopilot(self, dt):
         beats = self.audio.beat_count - self.last_beat_count
         self.last_beat_count = self.audio.beat_count
@@ -459,7 +473,10 @@ class App:
             if not self.frozen:
                 speed = P.v("speed")
                 st["time"] += dt * speed
-                st["pulse"] += dt * speed * (1.0 + self.audio.bass * P.v("react") * 1.5)
+                dp = dt * speed * (1.0 + self.audio.bass * P.v("react") * 1.5)
+                st["pulse"] += dp
+                if self.preset.ship:
+                    self.fly_ship(dt, dp)
             st["real_time"] = now - start
             st["cam_yaw"] = (st["cam_yaw"] + dt * P.v("cam_spin") * 0.6) % (2.0 * math.pi)
             st["flash"] = 1.0 if self.flash_held else st["flash"] * math.exp(-dt * 10.0)

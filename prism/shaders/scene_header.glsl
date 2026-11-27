@@ -22,6 +22,8 @@ uniform sampler2D uPrev;  // last composited frame (for feedback tricks)
 uniform sampler2D uVideo; // live video input (channel order set by VIDEO_SWIZZLE)
 uniform sampler2D uFFT;   // 128-bin log spectrum in .r
 uniform vec3 uPal[5];     // current palette (5 colour stops, cyclic, darkest first)
+uniform vec4 uShip;       // presets with "ship": true: the app flies a ship: x, z, heading (radians), steer (-1..1)
+uniform float uShipAlt;   // its altitude setting 0..1 (knob C plus the up/down arrow keys)
 
 in vec2 vUV;
 out vec4 fragColor;
