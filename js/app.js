@@ -4,6 +4,8 @@
   "use strict";
   const D = window.PRISM_DATA;
   const $ = (sel) => document.querySelector(sel);
+  // the flash-word button cycles through these (shuffled); editable in Settings as a comma-separated list
+  const DEFAULT_WORDS = "KETAMINE, MOLLY, BOOF, K-HOLE, ACID, SHROOMS, DMT, NANG, ROLLING, PINGERS, CANDYFLIP, BONER, JAW SWEATS, GURN, SWEATY, MOIST, CHEWING, DILATED, PUPILS, SPAGHETTI LEGS, PLUR, DROP, WOMP, BASS FACE, RAIL, KANDI, GLOWSTICK, AFTERS, SEND IT, ONE MORE TUNE, HYDRATE, WHERE'S MY PHONE, NO SLEEP, RIGHT NOW, BONK, GOON, GOONVIZ, HONK, YEET, ZOINKS, BRUH, SKRRT";
   const store = {
     get(key, fallback) {
       try { const v = localStorage.getItem("prism." + key); return v === null ? fallback : JSON.parse(v); }
@@ -58,7 +60,9 @@
       this.mapName = store.get("mapName", "akai_mpd32");
       this.loadMap();
       this.snapshots = store.get("snapshots", {});
-      this.settings = Object.assign({ quality: "auto", pickup: false, osd: true, word: "KETAMINE" }, store.get("settings", {}));
+      this.settings = Object.assign({ quality: "auto", pickup: false, osd: true, word: DEFAULT_WORDS }, store.get("settings", {}));
+      if (this.settings.word === "KETAMINE") this.settings.word = DEFAULT_WORDS;   // the old single-word default
+      this.wordBag = [];
       this.pilot = new Prism.Autopilot(this.params, D.kaleidoChaos, D.palettes.length);
       // autopilot may only pick what works right now: no camera presets without a camera, nothing heavy on a Pi
       this.pilot.configure(this.presets, (i) => {
@@ -284,7 +288,15 @@
     // slam the flash word over the visuals (restarting the animation on every hit)
     flashWord() {
       const el = $("#word");
-      el.textContent = this.settings.word || "KETAMINE";
+      // a shuffled bag of the comma-separated words: every word comes up once before any repeats
+      const words = (this.settings.word || DEFAULT_WORDS).split(",").map((w) => w.trim()).filter(Boolean);
+      if (!this.wordBag.length || this.wordBag.some((w) => !words.includes(w))) {
+        this.wordBag = words.slice();
+        for (let i = this.wordBag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [this.wordBag[i], this.wordBag[j]] = [this.wordBag[j], this.wordBag[i]]; }
+        if (this.wordBag.length > 1 && this.wordBag[this.wordBag.length - 1] === this.lastWord) this.wordBag.unshift(this.wordBag.pop());
+      }
+      this.lastWord = this.wordBag.pop() || "KETAMINE";
+      el.textContent = this.lastWord;
       // fit the stage (or the projector screen in fullscreen), whatever the word: Impact caps are ~0.55em wide
       const w = $("#stage").clientWidth;
       el.style.fontSize = `${Math.min(w * 0.17, (w * 0.86) / (Math.max(1, el.textContent.length) * 0.56))}px`;
@@ -711,7 +723,7 @@
       $("#osdToggle").onchange = (e) => { this.settings.osd = e.target.checked; store.set("settings", this.settings); if (!this.settings.osd) $("#osd").classList.remove("show"); };
       $("#pickup").onchange = (e) => { this.settings.pickup = e.target.checked; store.set("settings", this.settings); };
       $("#wordInput").value = this.settings.word;
-      $("#wordInput").oninput = (e) => { this.settings.word = e.target.value.trim() || "KETAMINE"; store.set("settings", this.settings); };
+      $("#wordInput").oninput = (e) => { this.settings.word = e.target.value.trim() || DEFAULT_WORDS; this.wordBag = []; store.set("settings", this.settings); };
 
       // MIDI map
       const mapSel = $("#mapSel");
