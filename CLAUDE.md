@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 39 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 40 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -50,6 +50,10 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   ship presets the arrow keys steer/climb instead of prev/next. Heading convention: steer > 0 decreases yaw
   (forward = (sin yaw, cos yaw) turns toward -x, which is screen right). The shader keeps the ship above
   the ground ahead; ship roll and camera roll have opposite sign conventions (see comments). ~1.6x Honeycomb.
+- 40 Disco Booty (no pad; user request): ellipsoid/capsule SDF in a twerk stance; dance() sets the pose once
+  per pixel. Time since the last beat is recovered from uBeat (it decays as exp(-7t)), which drives each
+  cheek's damped spring. Reflections use envAt() (club lamps + the light-up floor); only the materials the
+  D knob selects are evaluated. Cheaper than Honeycomb.
 - Header flag "manual": true keeps a preset out of autopilot and random picks; App.frame cuts knob A by 20%
   whenever a manual preset's frame takes > 450 ms (a guard against the GPU watchdog). No preset uses it now
   (the path-traced Overkill was removed at the user's request: noisy and not good-looking).
