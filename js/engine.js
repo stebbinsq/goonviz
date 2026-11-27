@@ -52,6 +52,7 @@ void main() {
       labels: meta.labels || {},
       heavy: !!meta.heavy,   // raymarched 3D/4D: too much for a Raspberry Pi
       manual: !!meta.manual, // only by hand: autopilot and random picks skip it (e.g. the benchmark monster)
+      ship: !!meta.ship,     // the app flies a ship for it (uShip): knob A throttle, B steer, C altitude; arrow keys steer
       energy: meta.energy || 2,          // 1 calm .. 3 intense (autopilot matches it to the music)
       family: meta.family || "organic",  // kind of picture (autopilot varies it and picks routines by it)
       stepped: steppedKnobs(source),
@@ -343,6 +344,7 @@ void main() {
       const gl = this.gl;
       if (v.length === 1) gl.uniform1f(loc, v[0]);
       else if (v.length === 2) gl.uniform2f(loc, v[0], v[1]);
+      else if (v.length === 4) gl.uniform4f(loc, v[0], v[1], v[2], v[3]);
     }
 
     setTex(p, name, unit, tex) {
@@ -393,6 +395,8 @@ void main() {
       s(p, "uVideo360", v360);
       s(p, "uCamView", P.v("cam_view"));
       s(p, "uCamYaw", st.camYaw);
+      s(p, "uShip", st.ship.x, st.ship.z, st.ship.yaw, st.ship.steer);
+      s(p, "uShipAlt", st.ship.alt);
       this.setTex(p, "uPrev", 0, prevTex);
       this.setTex(p, "uVideo", 1, this.videoTex);
       this.setTex(p, "uFFT", 2, this.fftTex);
