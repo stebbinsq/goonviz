@@ -52,6 +52,10 @@ def rel(path):
     return path if os.path.isabs(path) else os.path.join(ROOT, path)
 
 
+# the flash-word button cycles through these (shuffled); config "flash_word" takes a comma-separated list
+DEFAULT_WORDS = "KETAMINE, MOLLY, BOOF, K-HOLE, ACID, SHROOMS, DMT, NANG, ROLLING, PINGERS, CANDYFLIP, BONER, JAW SWEATS, GURN, SWEATY, MOIST, CHEWING, DILATED, PUPILS, SPAGHETTI LEGS, PLUR, DROP, WOMP, BASS FACE, RAIL, KANDI, GLOWSTICK, AFTERS, SEND IT, ONE MORE TUNE, HYDRATE, WHERE'S MY PHONE, NO SLEEP, RIGHT NOW, BONK, GOON, GOONVIZ, HONK, YEET, ZOINKS, BRUH, SKRRT"
+
+
 class App:
     def __init__(self, cfg):
         import pygame
@@ -246,7 +250,13 @@ class App:
         elif action == "hud":
             self.show_hud = not self.show_hud
         elif action == "word":
-            self.notify(self.cfg.get("flash_word", "KETAMINE"))   # the web app draws it big; here it's the HUD message
+            # a shuffled bag of words, none repeated until all have shown (the web app draws it big; here it's the HUD message)
+            words = [w.strip() for w in str(self.cfg.get("flash_word", DEFAULT_WORDS)).split(",") if w.strip()] or ["KETAMINE"]
+            bag = getattr(self, "_word_bag", [])
+            if not bag or any(w not in words for w in bag):
+                bag = random.sample(words, len(words))
+            self._word_bag = bag
+            self.notify(bag.pop())
             self.state["flash"] = max(self.state["flash"], 0.35)
         elif action.startswith("preset:"):
             self.select_preset(int(action.split(":")[1]) % n)

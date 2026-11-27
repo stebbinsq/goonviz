@@ -33,7 +33,7 @@ ACTIONS = {
     "tap": "fake a beat (tap along when there's no audio)",
     "video": "toggle video input on/off",
     "hud": "toggle the on-screen overlay",
-    "word": "flash the word (KETAMINE by default) on screen",
+    "word": "flash the next rave word (KETAMINE, MOLLY, BOOF...) on screen",
     "preset:N": "jump to preset N (0-based)",
     "snapshot:N": "recall snapshot N (shift + it saves)",
 }
