@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 42 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 45 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -62,6 +62,12 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   shots): from a plane point, the emission time follows from the distance travelled, so only 2-3 candidate
   bullets per family are tested; each glows by the view ray's 3D distance (orb()). HP/WARNING/PHASE come
   from uMusic; the player sits at uShip2.x (strafe) / uShip2.y. Cheaper than Honeycomb.
+- 43 Glowstick Shooter, 44 Out of Bounds, 45 Kaiju Tube Man (no pads; the user's picks from a brainstorm of
+  funny game-style visuals). Shooter: inside-out SDF (emptiness = corridor/door/room, so d = +emptiness),
+  pixelated by snapping uv to a virtual grid, billboard crowd sprites, HUD in virtual pixels. Out of Bounds and
+  Tube Man march cell-repeated worlds: the cell-edge bound (gBound) only limits the step, it must never be
+  returned as a surface distance (that made streaks). Tube Man: pose() fills joint arrays once per pixel.
+  Shooter is cheap; the other two cost about 2.5x Honeycomb.
 - Ship API: uShip (x, z, heading, steer) and uShip2 (strafe -1..1 from B + held arrows, altitude, distance,
   throttle). uMusic (slow energy, drop pulse, seconds since the drop, drop count) comes from App.trackMusic /
   native track_music, independent of autopilot.

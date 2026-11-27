@@ -86,6 +86,18 @@ flowers as the music gets louder, three-way shots aimed at you. When GoonViz hea
 WARNING and everything opens up; the boss's HP drains through the drop and refills toward the next one. You
 fire back on every beat, damage numbers pop off it. K2 (B) or ← → move your ship sideways, K3 (C) or ↑ ↓
 forward and back, K1 (A) = bullet density, K4 (D) = pattern mix.
+**Glowstick Shooter** (no pad): a 90s corridor shooter through an endless warehouse rave, in chunky pixels:
+posters, dance rooms full of lasers, a crowd waving glowsticks. Your weapon is a glowstick, swapped every 32
+beats or on a drop for a water bottle, hand fan, lighter or a phone at 2%; the status bar tracks HYDRATION,
+BRAINCELLS and VIBES, and the face gurns with the bass. A = lasers, B = look around, C = pixel size, D = crowd.
+**Out of Bounds** (no pad): you've clipped out of a platformer level and you're flying underneath it:
+missing-texture checkerboards, misaligned collision boxes, editor gizmos with labels like "TODO: fix this",
+the editor grid in the void, skybox seams. Vertices stretch into spikes on the beat; a drop tears the frame and
+fails an assertion. A = glitch, B = look around, C = noclip height (under / through / above), D = missing textures.
+**Kaiju Tube Man** (no pad): live news coverage of a thirty-storey inflatable tube man flailing over downtown.
+He folds in half every 16 beats and on a drop, his face always turns to the camera, the buildings bounce,
+helicopters circle with searchlights and the ticker reports developments. A = flail, B = orbit, C = zoom,
+D = colour (classic red and yellow at 0).
 They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
