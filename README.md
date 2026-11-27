@@ -80,6 +80,12 @@ A = jiggle, B = twerk, C = camera angle, D = material (mirror tiles, liquid chro
 everyone's thinking ("SOBRIETY ← CLOSED", "SPEED LIMIT 174 BPM", "LAST TRAIN HOME: MISSED"), LED billboards on
 the hills, trucks hauling glowsticks that swerve out of your lane, a speedometer in BPM. You drive: K2 (B) or
 holding ← → changes lanes, K1 (A) = throttle, K3 (C) = chase camera, K4 (D) = sunrise.
+**Boss Fight** (no pad): BOSS FIGHT: THE DROP. A cathedral-sized subwoofer god (its cone pumps with the bass,
+its eye follows you) fires bullet-hell patterns: interlocking rings on the beat, spiral arms and curling
+flowers as the music gets louder, three-way shots aimed at you. When GoonViz hears a drop the screen flashes
+WARNING and everything opens up; the boss's HP drains through the drop and refills toward the next one. You
+fire back on every beat, damage numbers pop off it. K2 (B) or ← → move your ship sideways, K3 (C) or ↑ ↓
+forward and back, K1 (A) = bullet density, K4 (D) = pattern mix.
 They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
@@ -307,7 +313,7 @@ Prefix a channel to restrict it: `"10:36"`. Program Change messages select prese
 
 | key | | key | |
 |---|---|---|---|
-| ← → | prev / next preset (steer in Wasteland, change lanes in Afters Highway; ↑ ↓ climb) | 1–0 | presets 1–10 |
+| ← → | prev / next preset (in the driving/flying presets they steer instead; ↑ ↓ climb) | 1–0 | presets 1–10 |
 | ↑ ↓ | select knob/action | `-` `=` | adjust (shift = coarse) |
 | Enter | trigger selected action | L | MIDI learn |
 | F1–F8 | recall snapshot (shift = save) | R / P | randomize FX / random preset |

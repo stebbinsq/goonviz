@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 41 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 42 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -58,6 +58,10 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
   traffic lanes with cheap lateral bounds (lane()), text on gantry signs/billboards/truck doors. Text in
   shaders: tools/glsl_text.py bakes the strings of a preset's `// @text {...}` line into a 5x7 pixel font
   between `// <text>` markers (drawText / drawNum / textLen); rerun it after editing that line.
+- 42 Boss Fight (no pad): bullets are analytic per family (rings, spiral arms, curling flowers, aimed
+  shots): from a plane point, the emission time follows from the distance travelled, so only 2-3 candidate
+  bullets per family are tested; each glows by the view ray's 3D distance (orb()). HP/WARNING/PHASE come
+  from uMusic; the player sits at uShip2.x (strafe) / uShip2.y. Cheaper than Honeycomb.
 - Ship API: uShip (x, z, heading, steer) and uShip2 (strafe -1..1 from B + held arrows, altitude, distance,
   throttle). uMusic (slow energy, drop pulse, seconds since the drop, drop count) comes from App.trackMusic /
   native track_music, independent of autopilot.
