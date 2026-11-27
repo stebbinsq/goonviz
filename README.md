@@ -63,7 +63,11 @@ contours and a subdividing grid. A = dive speed, D = film (natural, silver monoc
 reflection, dispersion splitting light into rainbow fire) over a black mirror floor, a sacred-geometry halo
 behind it. A = fire (quality), C = beat snap. **City** (no pad): Coastline's companion, an aerial flight over an
 endless city: towers downtown, a winding river with bridges, parks, window-lit facades and moving traffic.
-D = time of day (daylight, golden hour, night), C = data (survey lines and pulses down the streets), A = density. They're the heaviest presets and are
+D = time of day (daylight, golden hour, night), C = data (survey lines and pulses down the streets), A = density.
+**Stardust** and **Vortex** (no pads): real particles filmed through a lens. Stardust is a drifting cloud of
+blue-white filaments and gold specks with out-of-focus dust floating past as bokeh; Vortex is a whirlpool of
+ring strands that twist up into a spout, clumps streaming around faster near the middle. A = particle count,
+B = palette tint, C = turbulence / twist, D = depth of field. They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.
 
 **On a Raspberry Pi** (the website in Chromium, or the native app) GoonViz recognises the Pi and uses a light

@@ -14,7 +14,7 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 
 ## Web status (2026-10-29)
 
-- 36 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
+- 38 presets. Slots 04, 06, 11–14 were replaced (by user request) with raymarched 3D/4D presets: Quaternion
   Julia, Tesseract Lattice, Mandelbox, Apollonian Foam, Hyper Crystal, Hypergyroid; the six retired 2D presets
   are in presets/archive/ (not loaded). The user prefers these dense 3D/4D looks over simple 2D ones.
 - 31 Hyperbolic Honeycomb (pad C14): {4,3,5} honeycomb in the Poincare ball, flown through by Moebius
@@ -38,6 +38,12 @@ Branding: user-facing name is **GoonViz**; internal code names (`prism/` package
 - 36 City (no pad): block-cell SDF (four lots per block, district() noise for downtown towers), river blocks
   and parks; distance clamped at block edges. Windows fade to their average once smaller than a pixel (stops
   night speckle). ~2x Honeycomb, like Brilliant; Coastline is ~2.5x.
+- 37 Stardust / 38 Vortex (no pads; from a user's reference video of particle visuals): real particles, one per
+  voxel at most, placed by a 3D DDA in a tilted frame (axis-aligned voxel layers showed as lines edge-on); a
+  particle exists if hash < field density, so nothing flickers. Each is drawn as a disc of max(pixel, circle of
+  confusion) with energy spread over the disc; the glow is a separate smooth 28/56-step march. Bokeh dust is a
+  coarse DDA measured in screen space (round discs, no wide-angle stretch). Name vnoise, not noise3 (a GLSL
+  builtin). Stardust ~ Honeycomb cost, Vortex ~1.4x (CS 0.013, up to 420 voxels).
 - Header flag "manual": true keeps a preset out of autopilot and random picks; App.frame cuts knob A by 20%
   whenever a manual preset's frame takes > 450 ms (a guard against the GPU watchdog). No preset uses it now
   (the path-traced Overkill was removed at the user's request: noisy and not good-looking).
