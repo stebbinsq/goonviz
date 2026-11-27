@@ -396,7 +396,8 @@ void main() {
       s(p, "uCamView", P.v("cam_view"));
       s(p, "uCamYaw", st.camYaw);
       s(p, "uShip", st.ship.x, st.ship.z, st.ship.yaw, st.ship.steer);
-      s(p, "uShipAlt", st.ship.alt);
+      s(p, "uShip2", st.ship.strafe, st.ship.alt, st.ship.dist, P.v("a"));
+      s(p, "uMusic", st.music.slow, st.music.drop, Math.min(999, st.music.since), st.music.count);
       this.setTex(p, "uPrev", 0, prevTex);
       this.setTex(p, "uVideo", 1, this.videoTex);
       this.setTex(p, "uFFT", 2, this.fftTex);
