@@ -95,8 +95,11 @@ missing-texture checkerboards, misaligned collision boxes, editor gizmos with la
 the editor grid in the void, skybox seams. Vertices stretch into spikes on the beat; a drop tears the frame and
 fails an assertion. A = glitch, B = look around, C = noclip height (under / through / above), D = missing textures.
 **Kaiju Tube Man** (no pad): live news coverage of a thirty-storey inflatable tube man flailing over downtown.
-He folds in half every 16 beats and on a drop, his face always turns to the camera, the buildings bounce,
-helicopters circle with searchlights and the ticker reports developments. A = flail, B = orbit, C = zoom,
+He dances on the beat: snaps his lean to the other side on every beat, throws his arms up on each kick,
+head-bangs, puffs of air travel up his body, he inflates taller with the bass and sings along (his mouth opens
+on the bass). He folds in half every 16 beats and on a drop, his face always turns to the camera. Some towers
+light up like level meters, the buildings bounce, searchlights flash colours on the beat, and the ticker
+reports developments. A = flail, B = orbit, C = zoom,
 D = colour (classic red and yellow at 0).
 They're the heaviest presets and are
 meant for the Mac; on a Pi they'll crawl.

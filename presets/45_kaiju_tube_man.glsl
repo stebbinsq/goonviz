@@ -86,36 +86,64 @@ float gMat;                  // 0 street, 1 building, 2 tube man, 3 arm, 4 fan b
 vec2 gCell;
 float gBound;                // distance to the city cell's edge: limits the march step, never a surface
 
-void pose() {
-    // every joint bends a little, about an axis that drifts; the waves run up the body
-    float wild = 0.12 + 0.3 * uA;
+float sdCap2(vec3 p, vec3 a, vec3 b, float ra, float rb) {
+    vec3 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h) - mix(ra, rb, h);
+}
+float gRJ[13];               // the tube's radius at each joint (puffs of air travel up it)
+
+// The dance. Everything is locked to the beat: the time since the last kick comes from uBeat (it decays as
+// exp(-7t)), and the beat count plus that gives a phase that ticks over on every beat.
+void pose(vec3 view) {
+    float tb = -log(max(uBeat, 0.001)) / 7.0;
+    float phase = uBeatCount + min(tb / 0.47, 1.0);
+    float groove = 0.35 + 0.65 * clamp(uLevel * 1.6, 0.0, 1.0);    // he dances harder when it's louder
+    float wild = 0.03 + 0.1 * uA;
     float fold = 0.0;
     if (mod(floor(uBeatCount), 16.0) < 0.5) fold = uBeat;    // every 16 beats he folds in half
     fold = max(fold, uMusic.y);                                // and on a drop
+    // lean about the view axis (reads as left/right on screen); nod about the axis across it
+    vec3 vh = normalize(vec3(view.x, 0.0, view.z) + vec3(1e-4, 0.0, 0.0));
+    vec3 nodAxis = normalize(cross(vh, vec3(0.0, 1.0, 0.0)));
+    // each kick sends a puff of air up the tube: a bulge travelling from the fan to his head
+    float puffPos = tb * 15.0 - 1.0;
+    float puffAmp = (0.25 + 0.35 * uA) * exp(-tb * 1.5) * step(0.004, uBeat);
+    float len = SEG * (0.95 + 0.1 * clamp(uBass * 1.3, 0.0, 1.0));   // the bass inflates him taller
     gJ[0] = vec3(0.0, BASE, 0.0);
+    gRJ[0] = RB;
     vec3 dir = vec3(0.0, 1.0, 0.0);
     vec3 shoulder = gJ[0], sdir = dir;
     for (int i = 0; i < NB; i++) {
         float fi = float(i);
-        float ph = uTime * 1.6 - fi * 0.45;
+        // snap over to the other side on every beat, the lean whipping up the body a moment late
+        float ph = phase - fi * 0.035;
+        float sd = mod(floor(ph), 2.0) < 0.5 ? 1.0 : -1.0;
+        float lean = sd * (2.0 * smoothstep(0.0, 0.3, fract(ph)) - 1.0);
+        dir = normalize(rotAxis(dir, vh, lean * (0.05 + 0.09 * fi / 11.0) * (0.6 + uA) * groove));
+        // the organic flailing on top of that
         vec3 axis = normalize(vec3(cos(uTime * 0.23 + fi * 0.3), 0.0, sin(uTime * 0.23 + fi * 0.3)));
-        float a = wild * sin(ph) + wild * 0.5 * sin(ph * 2.3 + 1.0) + uBeat * 0.08 * (fi / 12.0);
-        if (i == 6) a += fold * 2.5;                             // the fold, at the waist
-        dir = normalize(rotAxis(dir, axis, a));
-        gJ[i + 1] = gJ[i] + dir * SEG;
+        float f = wild * sin(uTime * 1.6 - fi * 0.45) + wild * 0.5 * sin(uTime * 3.7 - fi * 0.6 + 1.0);
+        if (i == 6) f += fold * 2.5;                             // the fold, at the waist
+        dir = normalize(rotAxis(dir, axis, f));
+        // head-banging: the top nods toward us on every kick
+        if (i >= 9) dir = normalize(rotAxis(dir, nodAxis, -uBeat * 0.22 * groove));
+        gJ[i + 1] = gJ[i] + dir * len;
+        gRJ[i + 1] = RB * (1.0 + puffAmp * exp(-pow(fi + 1.0 - puffPos, 2.0) / 1.6)) * (i == NB - 1 ? 0.95 : 1.0);
         if (i == 8) { shoulder = gJ[i + 1]; sdir = dir; }
     }
-    // arms: from the shoulders, out sideways, whipping about much faster
-    vec3 side = normalize(cross(sdir, vec3(0.0, 0.0, 1.0)) + vec3(0.0, 0.0, 0.001));
+    // arms: thrown up on every kick, waving in time, wiggling with the hi-hats
+    vec3 side = normalize(cross(sdir, vh) + vec3(0.0, 0.001, 0.0));
     for (int s = 0; s < 2; s++) {
         float sg = s == 0 ? 1.0 : -1.0;
-        vec3 d = normalize(side * sg + sdir * 0.3);
+        vec3 d = normalize(side * sg + sdir * (0.15 + 1.6 * uBeat * groove + 0.4 * uMid));
         int o = s * 7;
         gArm[o] = shoulder;
         for (int i = 0; i < NA; i++) {
             float fi = float(i);
-            vec3 axis = normalize(cross(d, vec3(0.0, 1.0, 0.0)) + vec3(0.001));
-            float a = (0.35 + 0.5 * uA) * sin(uTime * 4.2 + fi * 0.8 + sg) + uBeat * 0.4 * sg;
+            vec3 axis = normalize(cross(d, vh) + vec3(0.001));
+            float a = (0.25 + 0.35 * uA) * sin(TAU * phase + fi * 0.9 + sg * 1.5) * (0.6 + 0.6 * groove)
+                    + 0.15 * uHigh * sin(uRealTime * 23.0 + fi * 2.0 + sg);
             d = normalize(rotAxis(d, axis, a));
             gArm[o + i + 1] = gArm[o + i] + d * 1.25;
         }
@@ -125,10 +153,7 @@ void pose() {
 float tubeMan(vec3 p) {
     float d = 1e3;
     gMat = 2.0;
-    for (int i = 0; i < NB; i++) {
-        float r = RB * (i == NB - 1 ? 0.95 : 1.0);
-        d = min(d, sdCap(p, gJ[i], gJ[i + 1], r));
-    }
+    for (int i = 0; i < NB; i++) d = min(d, sdCap2(p, gJ[i], gJ[i + 1], gRJ[i], gRJ[i + 1]));
     float arms = 1e3;
     for (int i = 0; i < 13; i++) {
         if (i == 6) continue;                                    // the gap between the two arms
@@ -140,7 +165,7 @@ float tubeMan(vec3 p) {
     vec3 sideV = normalize(cross(gHeadUp, gFront));
     for (int s = 0; s < 2; s++) {
         vec3 ec = hc + gFront * (RB * 0.88) + sideV * (s == 0 ? 0.38 : -0.38) + gHeadUp * 0.25;
-        float e = length(p - ec) - 0.24;
+        float e = length(p - ec) - 0.24 * (1.0 + 0.3 * uBeat);
         if (e < d) { d = e; gMat = 5.0; }
     }
     // the fan box he's tethered to
@@ -161,7 +186,7 @@ float city(vec3 p) {
     if (max(abs(id.x + 0.5), abs(id.y + 0.5)) < 2.0) return d;    // the plaza
     float h = hash12(id);
     float ht = 1.5 + pow(h, 3.0) * 8.5 + 1.5 * h;
-    ht *= 1.0 + uBeat * 0.05 * hash12(id + 3.0);
+    ht *= 1.0 + uBeat * 0.12 * hash12(id + 3.0);
     vec2 hs = vec2(1.6 + 0.5 * hash12(id + 1.0), 1.6 + 0.5 * hash12(id + 2.0));
     float b = sdBox(vec3(l.x, p.y - ht * 0.5, l.y), vec3(hs.x, ht * 0.5, hs.y));
     if (h > 0.7) b = min(b, sdBox(vec3(l.x, p.y - ht - 1.5, l.y), vec3(hs * 0.6, 1.5)));   // a setback tier
@@ -192,13 +217,14 @@ vec3 heli(int i) {
 vec3 beamTarget(int i) { return gJ[7 + i] + vec3(sin(uTime * 0.7 + float(i)), 0.0, cos(uTime * 0.6 + float(i))) * 1.5; }
 
 vec3 scene(vec2 p, vec2 uv) {
-    pose();
-    // camera: a news helicopter of our own, orbiting, a little shaky
+    // camera: a news helicopter of our own, orbiting, a little shaky (and jolted by the kicks)
     float ang = (uB - 0.5) * 4.0 + uTime * 0.05;
     float dist = mix(62.0, 30.0, uC);
     vec3 ta = vec3(0.0, 15.0, 0.0) + vec3(sin(uRealTime * 1.3), sin(uRealTime * 1.7), 0.0) * 0.15;
+    ta += vec3(sin(uRealTime * 41.0), cos(uRealTime * 37.0), 0.0) * uBeat * 0.35;
     vec3 ro = vec3(sin(ang) * dist, 21.0 + 5.0 * sin(uTime * 0.07), cos(ang) * dist);
     vec3 fw = normalize(ta - ro);
+    pose(fw);
     vec3 rt = normalize(cross(fw, vec3(0.0, 1.0, 0.0))), up = cross(rt, fw);
     vec3 rd = normalize(p.x * rt + p.y * up + 1.6 * fw);
     // the face looks at the camera
@@ -234,7 +260,7 @@ vec3 scene(vec2 p, vec2 uv) {
             vec3 tp = pos - hp;
             float cs = dot(normalize(tp), bd);
             float spot = smoothstep(0.985, 0.995, cs);
-            lit += vec3(0.9, 0.95, 1.0) * spot * max(dot(n, -normalize(tp)), 0.0) * 1.6;
+            lit += mix(vec3(0.9, 0.95, 1.0), glowpal(float(i) * 0.33 + uTime * 0.05) * 1.3, uBeat * 0.8) * spot * max(dot(n, -normalize(tp)), 0.0) * 1.6;
         }
         if (mat == 2.0 || mat == 3.0) {
             // the nylon: a bright colour, wrinkled, with a satin sheen; it glows a little inside on the beat
@@ -243,15 +269,18 @@ vec3 scene(vec2 p, vec2 uv) {
             vec3 base = mix(classic, glowpal(uD + (mat == 2.0 ? 0.05 : 0.45)) * 1.2, smoothstep(0.0, 0.6, uD));
             float wr = 0.85 + 0.15 * sin(dot(pos, gHeadUp) * 6.0 + noise(pos.xz * 2.0) * 3.0);
             float fres = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
-            col = base * (lit * 1.6 + 0.15) * wr + base * fres * 0.6 + base * uBeat * 0.35;
+            col = base * (lit * 1.6 + 0.15) * wr + base * fres * 0.6 + base * uBeat * 0.5;
             // the face: a huge grin under the eyes
             vec3 hc = mix(gJ[NB - 1], gJ[NB], 0.55);
             vec3 sideV = normalize(cross(gHeadUp, gFront));
             vec3 lp = pos - hc;
             float fx = dot(lp, sideV), fy = dot(lp, gHeadUp), fz = dot(lp, gFront);
             if (mat == 2.0 && fz > 0.4) {
-                float smile = abs(length(vec2(fx, fy - 0.35) * vec2(1.0, 1.3)) - 0.62) - 0.06;
-                if (smile < 0.0 && fy < 0.0) col = vec3(0.03);
+                // the mouth: a grin that opens wide on the bass, like he's singing along
+                float open = 0.06 + 0.42 * clamp(uBass * 1.3 + uBeat * 0.3, 0.0, 1.0);
+                float my = fy + 0.3 - 0.35 * fx * fx;                // the corners curl up
+                float mouth = length(vec2(fx / 0.62, my / open)) - 1.0;
+                if (mouth < 0.0) col = mix(vec3(0.3, 0.02, 0.03), vec3(0.02), smoothstep(-0.2, -0.7, mouth));
                 // the frill on top of his head
                 float top = dot(pos - gJ[NB], gHeadUp);
                 col = mix(col, base * 1.4, smoothstep(-0.3, 0.0, top) * step(0.5, fract(atan(fx, fz) * 3.0)));
@@ -269,6 +298,12 @@ vec3 scene(vec2 p, vec2 uv) {
             float win = step(0.25, wf.x) * step(0.3, wf.y) * step(abs(n.y), 0.5);
             float on = step(hash12(wi + id * 17.0), 0.28);
             vec3 wc = mix(vec3(1.0, 0.75, 0.45), vec3(0.6, 0.8, 1.0), step(0.8, hash12(wi + 3.0)));
+            if (hash12(id + 9.0) > 0.72) {
+                // some towers dance too: their windows fill up to the bass like a level meter
+                float level = (0.2 + 0.8 * clamp(uBass * 1.4 * (0.6 + 0.8 * hash12(id + floor(uBeatCount))), 0.0, 1.0)) * 36.0;
+                on = step(wi.y, level);
+                wc = glowpal(hash12(id) + wi.y * 0.02 + uTime * 0.03) * 1.8;
+            }
             col = vec3(0.03, 0.035, 0.05) * (lit * 2.0 + 0.3) + wc * win * on * 0.45;
             col += vec3(0.5, 0.6, 0.8) * pow(max(dot(reflect(rd, n), normalize(vec3(0.0, 0.2, 1.0) - pos * 0.0)), 0.0), 8.0) * 0.05;
             if (n.y > 0.5) col = vec3(0.05) * (lit + 0.3) + vec3(1.0, 0.1, 0.05) * step(0.5, fract(uRealTime * 0.8 + hash12(id))) * smoothstep(0.04, 0.0, length(fract(pos.xz / BP) - 0.5)) * 3.0;
@@ -295,7 +330,8 @@ vec3 scene(vec2 p, vec2 uv) {
         float tc = max((ee - bb * dd) / den, 0.0);
         float dist = length(w0 + rd * sc - dir * tc);
         float wid = 0.2 + tc * 0.09;
-        col += vec3(0.6, 0.65, 0.75) * exp(-dist * dist / (wid * wid)) * step(0.0, sc) * step(sc, t) * 0.12;
+        vec3 bc = mix(vec3(0.6, 0.65, 0.75), glowpal(float(i) * 0.33 + uTime * 0.05), uBeat * 0.8);
+        col += bc * exp(-dist * dist / (wid * wid)) * smoothstep(0.0, 6.0, sc) * smoothstep(t + 2.0, t - 2.0, sc) * (0.09 + 0.05 * uBeat);
         vec3 v = a - ro;
         float dl = length(v - rd * dot(v, rd));
         col += vec3(0.3) * smoothstep(0.6, 0.2, dl) * step(dot(v, rd), t);
